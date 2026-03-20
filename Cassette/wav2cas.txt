@@ -1,0 +1,55 @@
+wav2cas v2 bugfix 2 - 2.0.0.2
+Copyright (c) 2008 Knut Roll-Lund
+
+Update history, new for this version
+- bug fixed in memory management (not bad)
+- improved robustness reading wav files
+- bug fixed in reading highspeed system files
+- wav save option (fresh 'perfect' wavs)
+
+Sorry it took this long - this is my hobby so I work with it when I feel like
+it and have some time.
+
+wav2cas v2 is a tool for reading programs and data stored on cassette tape by
+TRS-80 models I/III/4 and storing them in cas format for use with emulators.
+
+Installation... just put it in any directory you like for example c:\Program
+Files, then create a shortcut on your desktop (if you like). wav2cas can
+also be set up as a program that can handle wav files (so you can right-click a
+wav file and select wav2cas).
+
+The cassette tape will have to be transferred to the pc first to a plain wav
+file (PCM coded with no compression) using for example windows inbuilt Sound
+Recorder and connecting a cassettedecks earphone or line-out to the pc's
+line-in or microphone input. A compressed wav or mp3 file can be converted to
+plain wav before use with wav2cas.
+
+Samplerate should be 11025Hz or better, 8 bit or 16 bit - mono or stereo. If
+the cassette player is stereo use stereo also on the pc. wav2cas will combine
+the cannels to get the best possible result.
+
+wav2cas v2 will read any recording that has a proper TRS-80 header. Because the
+header is used for setting sensitivity etc. wav2cas v2 can't cope with
+fragments (yet). It will read multiple files in a recording even with
+different formats. Model I Level 1, Model I/III/4 level 2 (low) and Model
+III/4 highspeed tapes.
+
+Once you have a proper wav file it can be loaded in several ways. Plain old
+command line, dropping a wav file on wav2cas' desktop icon, starting wav2cas
+and pressing the open button (standard file open dialog) or dropping a wav
+file on the already open wav2cas.
+
+Sometimes wav2cas will use some time to process large wav's this is normal.
+For example a half hour wav containing 50 programs will take some time to
+process depending on how powerful your pc is.
+
+Sometimes you will find that wav2cas is unable to find a header. This is
+because the header is damaged in some way and a real TRS-80 would have similar
+problems. Use the display and study the waveform maybe it is possible to
+rerecord the wav with a little lower volume etc. Toggle the checkbox for level
+zoom to off to see real level. Too loud might create excessive ringing making
+real flanks impossible to detect.
+
+Any problems please contact me mailto:kr-lund@online.no
+
+Knut

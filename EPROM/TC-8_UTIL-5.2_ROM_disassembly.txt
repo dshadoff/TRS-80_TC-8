@@ -1,0 +1,705 @@
+; NOTES
+; ------
+; From Schematic:
+;   Data lines are only active ifR/W PORT 8
+;  
+; From Computer (i.e. "OUT 8,xx"):
+;
+; D0 - goes to pin  3 out of 8833 (pin  4 of 74175 - "1D", where "1Q" is pin  2, going to AUX)
+; D1 - does not get sent/received
+; D2 - goes to pin 10 out of 8833 (pin 12 of 74175 - "3D", where "3Q" is pin 10, going to J2 MOTOR)
+; D3 - goes to pin 13 out of 8833 (pin 13 of 74175 - "4D", where "4Q" is pin 15, going to J1 MOTOR)
+;
+; To Computer (i.e. "IN 8,xx"):
+;
+; D0 - comes from pin  2 from 8833, from the comparator circuit from tape
+;
+;
+3000: 18 1b        jr   $301D           ; Entry point including keyboard debounce routine
+3002: c3 23 30     jp   $3023           ; Main entry point
+3005: c3 1a 34     jp   $341A
+3008: c3 2b 34     jp   $342B
+300b: c3 68 34     jp   $3468
+300e: c3 73 34     jp   $3473
+3011: c3 20 34     jp   $3420       ; MOTOR_OFF
+3014: c3 a4 32     jp   $32A4
+3017: c3 c3 32     jp   $32C3
+301a: c3 72 35     jp   $3572
+301d: 21 72 35     ld   hl,$3572        ; Address of keyboard driver routine
+3020: 22 16 40     ld   ($4016),hl      ; inject into keyboard driver address (in keyboard DCB)
+3023: 21 9f 30     ld   hl,$309F        
+3026: 22 7a 41     ld   ($417A),hl      ; Address for DISK BASIC exit (OPEN)
+3029: 21 aa 30     ld   hl,$30AA
+302c: 22 86 41     ld   ($4186),hl      ; Address for DISK BASIC exit (CLOSE)
+302f: 22 ad 41     ld   ($41AD),hl      ; Address for DOS Exit from 1A1C
+3032: 21 9a 31     ld   hl,$319A
+3035: 22 cb 41     ld   ($41CB),hl      ; Address for DOS exit from ROM address 206F
+3038: 21 2d 31     ld   hl,$312D
+303b: 22 d7 41     ld   ($41D7),hl      ; Address for DOS exit from ROM address 219E
+303e: 21 c1 30     ld   hl,$30C1
+3041: 22 a7 41     ld   ($41A7),hl      ; Address for Restart 28H
+3044: 21 03 32     ld   hl,$3203
+3047: 22 80 41     ld   ($4180),hl      ; Address for DISK BASIC exit (GET)
+304a: 21 09 32     ld   hl,$3209
+304d: 22 83 41     ld   ($4183),hl      ; Address for DISK BASIC exit (PUT)
+3050: 21 28 32     ld   hl,$3228
+3053: 22 9b 41     ld   ($419B),hl      ; Address for DISK BASIC exit (LSET)
+3056: 21 1b 32     ld   hl,$321B
+3059: 22 c8 41     ld   ($41C8),hl      ; Address for DOS exit from ROM address 1EA6
+305c: 21 23 33     ld   hl,$3323
+305f: 22 a1 41     ld   ($41A1),hl      ; Address for DISK BASIC exit (SAVE)
+3062: 21 53 33     ld   hl,$3353
+3065: 22 89 41     ld   ($4189),hl      ; Address for DISK BASIC exit (LOAD)
+3068: 21 80 00     ld   hl,$0080
+306b: 22 79 40     ld   ($4079),hl
+306e: 21 60 42     ld   hl,$4260
+3071: 22 7b 40     ld   ($407B),hl
+3074: 2a 16 40     ld   hl,($4016)
+3077: 22 77 40     ld   ($4077),hl
+307a: 2a 1e 40     ld   hl,($401E)
+307d: 22 7d 40     ld   ($407D),hl
+3080: 3e c3        ld   a,$C3
+3082: 32 c7 41     ld   ($41C7),a       ; Enable 'JMP' for DOS exit (from ROM address 1EA6)
+3085: 32 d6 41     ld   ($41D6),a       ; Enable 'JMP' for DOS exit (from ROM address 219E)
+3088: 32 ca 41     ld   ($41CA),a       ; Enable 'JMP' for DOS exit (from ROM address 206F)
+308b: 32 a6 41     ld   ($41A6),a       ; Enable 'JMP' for Restart 28H
+308e: 32 ac 41     ld   ($41AC),a       ; Enable 'JMP' for DOS exit (from 1A1C)
+3091: 3e 03        ld   a,$03           ; State = 3 -> can be 1, 2, or 3
+3093: 32 6b 40     ld   ($406B),a       ; 406B = state holder
+3096: 21 5b 35     ld   hl,$355B        ; <CR> + "UTIL 5.2 READY" + <CR> + EOL
+3099: cd a7 28     call $28A7           ; Message output
+309c: c3 4a 33     jp   $334A
+
+TC8_OPEN:
+309f: 3a 6b 40     ld   a,($406B)       ; 406B = state holder
+30a2: fe 03        cp   $03
+30a4: c2 87 31     jp   nz,$3187
+30a7: af           xor  a
+30a8: 18 13        jr   $30BD
+
+TC8_CLOSE:
+30aa: 3a 6b 40     ld   a,($406B)       ; 406B = state holder
+30ad: fe 02        cp   $02
+30af: 20 0a        jr   nz,$30BB
+30b1: c5           push bc
+30b2: 0e 04        ld   c,$04
+30b4: cd c1 31     call $31C1
+30b7: cd ed 31     call $31ED
+30ba: c1           pop  bc
+30bb: 3e 03        ld   a,$03
+30bd: 32 6b 40     ld   ($406B),a       ; 406B = state holder
+30c0: c9           ret
+30c1: f5           push af
+30c2: cd c7 30     call $30C7
+30c5: f1           pop  af
+30c6: c9           ret
+30c7: e5           push hl
+30c8: 2a 7d 40     ld   hl,($407D)
+30cb: 22 1e 40     ld   ($401E),hl
+30ce: 2a 77 40     ld   hl,($4077)
+30d1: 22 16 40     ld   ($4016),hl
+30d4: e1           pop  hl
+30d5: 7e           ld   a,(hl)
+30d6: c9           ret
+30d7: 2a 16 40     ld   hl,($4016)
+30da: 22 77 40     ld   ($4077),hl
+30dd: 2a 1e 40     ld   hl,($401E)
+30e0: 22 7d 40     ld   ($407D),hl
+30e3: 21 47 31     ld   hl,$3147
+30e6: 22 16 40     ld   ($4016),hl
+30e9: 21 c1 31     ld   hl,$31C1
+30ec: 22 1e 40     ld   ($401E),hl
+30ef: e1           pop  hl
+30f0: 23           inc  hl
+30f1: 23           inc  hl
+30f2: 23           inc  hl
+30f3: 7e           ld   a,(hl)
+30f4: c9           ret
+30f5: fe 23        cp   $23
+30f7: c0           ret  nz
+30f8: 23           inc  hl
+30f9: 7e           ld   a,(hl)
+30fa: fe 31        cp   $31
+30fc: 20 04        jr   nz,$3102
+30fe: 3e 04        ld   a,$04
+3100: 18 05        jr   $3107
+3102: fe 32        cp   $32
+3104: c0           ret  nz
+3105: 3e 08        ld   a,$08
+3107: 32 6c 40     ld   ($406C),a
+310a: 23           inc  hl
+310b: 7e           ld   a,(hl)
+310c: fe 2c        cp   $2C
+310e: c9           ret
+310f: d9           exx
+3110: dd 21 7d 3c  ld   ix,$3C7D
+3114: fd 21 50 40  ld   iy,$4050
+3118: fd 36 1a 00  ld   (iy+$1a),$00
+311c: fd 36 1e 00  ld   (iy+$1e),$00
+3120: 2a 7b 40     ld   hl,($407B)
+3123: eb           ex   de,hl
+3124: 2a 79 40     ld   hl,($4079)
+3127: 19           add  hl,de
+3128: 2b           dec  hl
+3129: 22 71 40     ld   ($4071),hl
+312c: c9           ret
+312d: e5           push hl
+312e: cd f5 30     call $30F5
+3131: 20 95        jr   nz,$30C8
+3133: 3a 6b 40     ld   a,($406B)       ; 406B = state holder
+3136: fe 01        cp   $01
+3138: 28 0b        jr   z,$3145
+313a: f2 c8 30     jp   p,$30C8
+313d: 3e 01        ld   a,$01
+313f: 32 6b 40     ld   ($406B),a       ; 406B = state holder
+3142: cd 74 31     call $3174
+3145: 18 90        jr   $30D7
+3147: 3a 6b 40     ld   a,($406B)       ; 406B = state holder
+314a: fe 02        cp   $02
+314c: c8           ret  z
+314d: e5           push hl
+314e: 2a 73 40     ld   hl,($4073)
+3151: 7c           ld   a,h
+3152: b5           or   l
+3153: cc 74 31     call z,$3174
+3156: 2a 73 40     ld   hl,($4073)
+3159: 2b           dec  hl
+315a: 22 73 40     ld   ($4073),hl
+315d: 2a 75 40     ld   hl,($4075)
+3160: 7e           ld   a,(hl)
+3161: fe 04        cp   $04
+3163: 1e 06        ld   e,$06
+3165: 28 06        jr   z,$316D
+3167: 23           inc  hl
+3168: 22 75 40     ld   ($4075),hl
+316b: e1           pop  hl
+316c: c9           ret
+316d: e1           pop  hl
+316e: cd c7 30     call $30C7
+3171: c3 a2 19     jp   $19A2
+3174: dd e5        push ix
+3176: fd e5        push iy
+3178: cd 0f 31     call $310F
+317b: cd d2 34     call $34D2
+317e: 2a 7b 40     ld   hl,($407B)
+3181: 22 75 40     ld   ($4075),hl
+3184: d4 73 34     call nc,$3473
+3187: cd 20 34     call $3420       ; MOTOR_OFF
+318a: 2a 79 40     ld   hl,($4079)
+318d: 22 73 40     ld   ($4073),hl
+3190: d9           exx
+3191: fd e1        pop  iy
+3193: dd e1        pop  ix
+3195: 1e 2a        ld   e,$2A
+3197: 38 d4        jr   c,$316D
+3199: c9           ret
+319a: e5           push hl
+319b: cd f5 30     call $30F5
+319e: c2 c8 30     jp   nz,$30C8
+31a1: 3a 6b 40     ld   a,($406B)       ; 406B = state holder
+31a4: fe 02        cp   $02
+31a6: 28 16        jr   z,$31BE
+31a8: fe 01        cp   $01
+31aa: f2 c8 30     jp   p,$30C8
+31ad: 3e 02        ld   a,$02
+31af: 32 6b 40     ld   ($406B),a       ; 406B = state holder
+31b2: 2a 7b 40     ld   hl,($407B)
+31b5: 22 75 40     ld   ($4075),hl
+31b8: 2a 79 40     ld   hl,($4079)
+31bb: 22 73 40     ld   ($4073),hl
+31be: c3 d7 30     jp   $30D7
+31c1: f5           push af
+31c2: 79           ld   a,c
+31c3: fe 0d        cp   $0D
+31c5: cc c7 30     call z,$30C7
+31c8: 3a 6b 40     ld   a,($406B)       ; 406B = state holder
+31cb: fe 02        cp   $02
+31cd: 20 1c        jr   nz,$31EB
+31cf: e5           push hl
+31d0: 2a 73 40     ld   hl,($4073)
+31d3: 7c           ld   a,h
+31d4: b5           or   l
+31d5: 20 07        jr   nz,$31DE
+31d7: cd ed 31     call $31ED
+31da: 2a 73 40     ld   hl,($4073)
+31dd: 00           nop
+31de: 2b           dec  hl
+31df: 22 73 40     ld   ($4073),hl
+31e2: 2a 75 40     ld   hl,($4075)
+31e5: 71           ld   (hl),c
+31e6: 23           inc  hl
+31e7: 22 75 40     ld   ($4075),hl
+31ea: e1           pop  hl
+31eb: f1           pop  af
+31ec: c9           ret
+31ed: dd e5        push ix
+31ef: fd e5        push iy
+31f1: cd 0f 31     call $310F
+31f4: cd 95 32     call $3295
+31f7: 2a 7b 40     ld   hl,($407B)
+31fa: 22 75 40     ld   ($4075),hl
+31fd: cd c3 32     call $32C3
+3200: c3 87 31     jp   $3187
+
+TC8_GET:
+3203: cd 33 32     call $3233
+3206: c3 56 33     jp   $3356
+
+TC8_PUT:
+3209: cd 33 32     call $3233
+320c: 11 52 40     ld   de,$4052
+320f: cd 34 35     call $3534
+3212: 11 5c 40     ld   de,$405C
+3215: cd 4e 32     call $324E
+3218: c3 39 33     jp   $3339
+321b: 7e           ld   a,(hl)
+321c: fe 22        cp   $22
+321e: c0           ret  nz
+321f: cd c8 33     call $33C8
+3222: fd 36 1e 20  ld   (iy+$1e),$20
+3226: 18 de        jr   $3206
+
+TC8_LSET:
+3228: cd c8 33     call $33C8
+322b: cd 1a 34     call $341A
+322e: cd e9 34     call $34E9
+3231: 18 fb        jr   $322E
+3233: fd 21 50 40  ld   iy,$4050
+3237: fd 36 11 25  ld   (iy+$11),$25
+323b: fd 36 1e 10  ld   (iy+$1e),$10
+323f: c3 d4 33     jp   $33D4
+3242: 2a 5f 40     ld   hl,($405F)
+3245: cd 20 34     call $3420       ; MOTOR_OFF
+3248: cd 61 1b     call $1B61
+324b: c3 b2 02     jp   $02B2
+324e: 06 03        ld   b,$03
+3250: cd 6c 32     call $326C
+3253: 12           ld   (de),a
+3254: 23           inc  hl
+3255: 1b           dec  de
+3256: cd 6c 32     call $326C
+3259: 12           ld   (de),a
+325a: 23           inc  hl
+325b: 7e           ld   a,(hl)
+325c: fe 2c        cp   $2C
+325e: c2 67 32     jp   nz,$3267
+3261: 23           inc  hl
+3262: 13           inc  de
+3263: 13           inc  de
+3264: 13           inc  de
+3265: 10 e9        djnz $3250
+3267: 05           dec  b
+3268: c8           ret  z
+3269: c3 97 19     jp   $1997
+326c: 7e           ld   a,(hl)
+326d: cd 80 32     call $3280
+3270: cb 27        sla  a
+3272: cb 27        sla  a
+3274: cb 27        sla  a
+3276: cb 27        sla  a
+3278: 4f           ld   c,a
+3279: 23           inc  hl
+327a: 7e           ld   a,(hl)
+327b: cd 80 32     call $3280
+327e: b1           or   c
+327f: c9           ret
+3280: d6 47        sub  $47
+3282: f2 97 19     jp   p,$1997
+3285: c6 06        add  a,$06
+3287: f2 8f 32     jp   p,$328F
+328a: c6 07        add  a,$07
+328c: f2 97 19     jp   p,$1997
+328f: c6 0a        add  a,$0A
+3291: fa 97 19     jp   m,$1997
+3294: c9           ret
+
+3295: cd 1a 34     call $341A
+3298: 11 ff 1f     ld   de,$1FFF
+329b: cd 02 33     call $3302
+329e: 1b           dec  de
+329f: 7a           ld   a,d
+32a0: b3           or   e
+32a1: 20 f8        jr   nz,$329B
+32a3: c9           ret
+
+32a4: 21 60 40     ld   hl,$4060
+32a7: 22 71 40     ld   ($4071),hl
+32aa: cd 95 32     call $3295
+32ad: 21 50 40     ld   hl,$4050
+32b0: cd c3 32     call $32C3
+32b3: 2a 5d 40     ld   hl,($405D)
+32b6: 22 71 40     ld   ($4071),hl
+32b9: 11 ff 00     ld   de,$00FF
+32bc: cd 9b 32     call $329B
+32bf: 2a 5b 40     ld   hl,($405B)
+32c2: c9           ret
+
+32c3: cd 10 33     call $3310
+32c6: 16 b3        ld   d,$B3
+32c8: cd ea 32     call $32EA
+32cb: fd 36 1f 00  ld   (iy+$1f),$00
+32cf: 2b           dec  hl
+32d0: 23           inc  hl
+32d1: 56           ld   d,(hl)
+32d2: fd 7e 1f     ld   a,(iy+$1f)
+32d5: 82           add  a,d
+32d6: fd 77 1f     ld   (iy+$1f),a
+32d9: cd ea 32     call $32EA
+32dc: ed 5b 71 40  ld   de,($4071)
+32e0: b7           or   a
+32e1: eb           ex   de,hl
+32e2: ed 52        sbc  hl,de
+32e4: eb           ex   de,hl
+32e5: 20 e9        jr   nz,$32D0
+32e7: fd 56 1f     ld   d,(iy+$1f)
+32ea: 0e 08        ld   c,$08
+32ec: cd 10 33     call $3310
+32ef: cb 42        bit  0,d
+32f1: 28 05        jr   z,$32F8
+32f3: cd 10 33     call $3310
+32f6: 18 03        jr   $32FB
+32f8: cd 05 33     call $3305
+32fb: 0d           dec  c
+32fc: 28 0b        jr   z,$3309
+32fe: cb 0a        rrc  d
+3300: 18 ea        jr   $32EC
+3302: cd 10 33     call $3310
+3305: 06 18        ld   b,$18
+3307: 18 17        jr   $3320
+3309: cd 10 33     call $3310
+330c: 06 10        ld   b,$10
+330e: 18 10        jr   $3320
+
+3310: 06 0e        ld   b,$0E
+3312: fd 7e 1d     ld   a,(iy+$1d)
+3315: 2f           cpl
+3316: e6 01        and  $01
+3318: fd 77 1d     ld   (iy+$1d),a
+331b: fd b6 1c     or   (iy+$1c)
+331e: d3 08        out  ($08),a
+3320: 10 fe        djnz $3320
+3322: c9           ret
+
+TC8_SAVE:
+3323: cd c8 33     call $33C8
+3326: 11 52 40     ld   de,$4052
+3329: cd 34 35     call $3534
+332c: 2a a4 40     ld   hl,($40A4)
+332f: 22 5b 40     ld   ($405B),hl
+3332: 2a f9 40     ld   hl,($40F9)
+3335: 2b           dec  hl
+3336: 22 5d 40     ld   ($405D),hl
+3339: cd a4 32     call $32A4
+333c: cd c3 32     call $32C3
+333f: cd 0c 34     call $340C
+3342: 21 64 35     ld   hl,$3564            ; " READY" + <CR> + EOL
+3345: cd a7 28     call $28A7               ; Message output
+3348: 18 00        jr   $334A
+
+;-------------------------------
+; Finish command
+END_CMD:
+334a: cd 20 34     call $3420           ; MOTOR_OFF
+334d: cd 61 1b     call $1B61
+3350: c3 33 1a     jp   $1A33
+
+TC8_LOAD:
+3353: cd c8 33     call $33C8
+3356: cd 25 35     call $3525
+3359: cd 2b 34     call $342B
+335c: 38 57        jr   c,$33B5
+335e: fd cb 1e 66  bit  4,(iy+$1e)
+3362: 20 16        jr   nz,$337A
+3364: 37           scf
+3365: 3f           ccf
+3366: eb           ex   de,hl
+3367: 2a a4 40     ld   hl,($40A4)
+336a: ed 52        sbc  hl,de
+336c: eb           ex   de,hl
+336d: 2a 5d 40     ld   hl,($405D)
+3370: 19           add  hl,de
+3371: 22 5d 40     ld   ($405D),hl
+3374: 22 71 40     ld   ($4071),hl
+3377: 2a a4 40     ld   hl,($40A4)
+337a: cd 73 34     call $3473
+337d: 38 36        jr   c,$33B5
+337f: cd 0c 34     call $340C
+3382: cd 20 34     call $3420       ; MOTOR_OFF
+3385: fd 7e 1e     ld   a,(iy+$1e)
+3388: e6 0e        and  $0E
+338a: fe 0c        cp   $0C
+338c: 28 cb        jr   z,$3359
+338e: 21 64 35     ld   hl,$3564            ; " READY" + <CR> + EOL            
+3391: cb 57        bit  2,a
+3393: 20 b5        jr   nz,$334A
+3395: cd a7 28     call $28A7               ; Message output
+3398: fd cb 1e 66  bit  4,(iy+$1e)
+339c: c2 42 32     jp   nz,$3242
+339f: 2a 5d 40     ld   hl,($405D)
+33a2: 23           inc  hl
+33a3: 22 f9 40     ld   ($40F9),hl
+33a6: fd cb 1e 6e  bit  5,(iy+$1e)
+33aa: c1           pop  bc
+33ab: c2 5d 1b     jp   nz,$1B5D
+33ae: 2a a4 40     ld   hl,($40A4)
+33b1: e5           push hl
+33b2: c3 e8 1a     jp   $1AE8
+33b5: cd 0c 34     call $340C
+33b8: fd 7e 1e     ld   a,(iy+$1e)
+33bb: e6 06        and  $06
+33bd: cc 4d 1b     call z,$1B4D
+33c0: 21 6c 35     ld   hl,$356C            ; " BAD" + <CR> + EOL
+33c3: cd a7 28     call $28A7               ; Message output
+33c6: 18 82        jr   $334A
+
+33c8: fd 21 50 40  ld   iy,$4050
+33cc: fd 36 11 24  ld   (iy+$11),$24
+33d0: fd 36 1e 01  ld   (iy+$1e),$01
+33d4: dd 21 7d 3c  ld   ix,$3C7D
+33d8: dd 36 00 2d  ld   (ix+$00),$2D
+33dc: dd 36 02 2d  ld   (ix+$02),$2D
+33e0: fd 7e 11     ld   a,(iy+$11)
+33e3: fd 77 01     ld   (iy+$01),a
+33e6: fd 36 00 9d  ld   (iy+$00),$9D
+33ea: 7e           ld   a,(hl)
+33eb: fe 4e        cp   $4E
+33ed: 20 06        jr   nz,$33F5
+33ef: fd cb 1e d6  set  2,(iy+$1e)
+33f3: 18 08        jr   $33FD
+33f5: fe b2        cp   $B2
+33f7: 20 05        jr   nz,$33FE
+33f9: fd cb 1e ce  set  1,(iy+$1e)
+33fd: 23           inc  hl
+33fe: fd 36 1c 04  ld   (iy+$1c),$04
+3402: 7e           ld   a,(hl)
+3403: fe 32        cp   $32
+3405: c0           ret  nz
+3406: fd 36 1c 08  ld   (iy+$1c),$08
+340a: 23           inc  hl
+340b: c9           ret
+
+340c: fd 36 0a 00  ld   (iy+$0a),$00
+3410: fd 36 00 20  ld   (iy+$00),$20
+3414: 21 50 40     ld   hl,$4050
+3417: c3 a7 28     jp   $28A7               ; Message output
+341a: f3           di
+341b: fd 7e 1c     ld   a,(iy+$1c)
+341e: 18 02        jr   $3422
+
+;-----------------------------
+MOTOR_OFF:
+
+3420: 3e ff        ld   a,$FF
+3422: d3 08        out  ($08),a
+3424: c9           ret
+
+3425: e6 31        and  $31
+3427: c8           ret  z
+3428: cd 0c 34     call $340C
+
+342b: fd 36 1f 9d  ld   (iy+$1f),$9D
+342f: 21 60 40     ld   hl,$4060
+3432: 22 71 40     ld   ($4071),hl
+3435: 21 51 40     ld   hl,$4051
+3438: fd 36 1a 00  ld   (iy+$1a),$00
+343c: cd d2 34     call $34D2
+343f: d8           ret  c
+3440: cd c1 34     call $34C1
+3443: cd fa 34     call $34FA
+3446: fe 9d        cp   $9D
+3448: 20 e1        jr   nz,$342B
+344a: cd 7a 34     call $347A
+344d: d8           ret  c
+344e: 06 09        ld   b,$09
+3450: 21 51 40     ld   hl,$4051
+3453: 11 61 40     ld   de,$4061
+3456: 1a           ld   a,(de)
+3457: be           cp   (hl)
+3458: fd 7e 1e     ld   a,(iy+$1e)
+345b: 20 c8        jr   nz,$3425
+345d: fd 77 1a     ld   (iy+$1a),a
+3460: cb 5f        bit  3,a
+3462: 20 04        jr   nz,$3468
+3464: 23           inc  hl
+3465: 13           inc  de
+3466: 10 ee        djnz $3456
+3468: 2a 5d 40     ld   hl,($405D)
+346b: 22 71 40     ld   ($4071),hl
+346e: 2a 5b 40     ld   hl,($405B)
+3471: 05           dec  b
+3472: c9           ret
+3473: fd 36 1f 00  ld   (iy+$1f),$00
+3477: cd c1 34     call $34C1
+347a: dd 36 02 2a  ld   (ix+$02),$2A
+347e: 2b           dec  hl
+347f: 23           inc  hl
+3480: cd fa 34     call $34FA
+3483: fd cb 1a 56  bit  2,(iy+$1a)
+3487: 20 0c        jr   nz,$3495
+3489: fd cb 1a 4e  bit  1,(iy+$1a)
+348d: 20 01        jr   nz,$3490
+348f: 77           ld   (hl),a
+3490: be           cp   (hl)
+3491: 06 4d        ld   b,$4D
+3493: 20 27        jr   nz,$34BC
+3495: fd 86 1f     add  a,(iy+$1f)
+3498: fd 77 1f     ld   (iy+$1f),a
+349b: cb 47        bit  0,a
+349d: 20 08        jr   nz,$34A7
+349f: 3e 0a        ld   a,$0A
+34a1: dd ae 02     xor  (ix+$02)
+34a4: dd 77 02     ld   (ix+$02),a
+34a7: eb           ex   de,hl
+34a8: 2a 71 40     ld   hl,($4071)
+34ab: df           rst  $18
+34ac: eb           ex   de,hl
+34ad: 20 d0        jr   nz,$347F
+34af: cd fa 34     call $34FA
+34b2: fd be 1f     cp   (iy+$1f)
+34b5: dd 36 02 5b  ld   (ix+$02),$5B
+34b9: c8           ret  z
+34ba: 06 43        ld   b,$43
+34bc: dd 70 02     ld   (ix+$02),b
+34bf: 37           scf
+34c0: c9           ret
+34c1: cd 10 35     call $3510
+34c4: cd 10 35     call $3510
+34c7: f2 c4 34     jp   p,$34C4
+34ca: cd fd 34     call $34FD
+34cd: fe b3        cp   $B3
+34cf: c8           ret  z
+34d0: 18 ef        jr   $34C1
+34d2: cd 1a 34     call $341A
+34d5: 1e ff        ld   e,$FF
+34d7: cd e9 34     call $34E9
+34da: cd 10 35     call $3510
+34dd: fa d5 34     jp   m,$34D5
+34e0: 1d           dec  e
+34e1: 20 f4        jr   nz,$34D7
+34e3: dd 36 00 2a  ld   (ix+$00),$2A
+34e7: b7           or   a
+34e8: c9           ret
+34e9: 3a 40 38     ld   a,($3840)
+34ec: e6 04        and  $04
+34ee: c8           ret  z
+34ef: 3e 31        ld   a,$31
+34f1: fd a6 1e     and  (iy+$1e)
+34f4: c2 4a 33     jp   nz,$334A
+34f7: c1           pop  bc
+34f8: 37           scf
+34f9: c9           ret
+
+; Read a byte
+;
+34fa: cd 10 35     call $3510       ; Throw away first bit ?
+34fd: 1e 09        ld   e,$09
+34ff: 1d           dec  e
+3500: c8           ret  z
+
+3501: cb 3f        srl  a
+3503: cd 10 35     call $3510       ; get a bit
+3506: f2 ff 34     jp   p,$34FF     ; 'P' flag set means a '0' value from tape
+3509: cd 10 35     call $3510       ; get a bit
+350c: f6 80        or   $80         ; this time, put a '1' value into A
+350e: 18 ef        jr   $34FF
+
+;
+; Read a Bit from tape
+; --------------------
+; This checks for zero-crossing duration
+;
+3510: 57           ld   d,a         ; store A for later
+3511: fd 4e 20     ld   c,(iy+$20)  ; last value from port
+3514: 06 00        ld   b,$00       ; start counter
+3516: 04           inc  b
+3517: db 08        in   a,($08)     ; read
+3519: b9           cp   c           ; same as previous value ?
+351a: ca 16 35     jp   z,$3516     ; if so, loop until it changes
+351d: fd 77 20     ld   (iy+$20),a  ; store new value for next time
+3520: 78           ld   a,b         ; how high did we count
+3521: fe 0e        cp   $0E         ; threshold - value returns in 'C'/'P' flags
+3523: 7a           ld   a,d         ; restore A
+3524: c9           ret
+
+3525: 2b           dec  hl
+3526: d7           rst  $10
+3527: 11 62 40     ld   de,$4062
+352a: fe 22        cp   $22
+352c: 28 06        jr   z,$3534
+352e: fd cb 1e de  set  3,(iy+$1e)
+3532: 18 15        jr   $3549
+
+3534: 2b           dec  hl
+3535: d7           rst  $10
+3536: fe 22        cp   $22
+3538: 20 14        jr   nz,$354E
+353a: 06 08        ld   b,$08
+353c: d7           rst  $10
+353d: 28 14        jr   z,$3553
+353f: fe 22        cp   $22
+3541: 28 10        jr   z,$3553
+3543: 12           ld   (de),a
+3544: 13           inc  de
+3545: 10 f5        djnz $353C
+3547: 00           nop
+3548: d7           rst  $10
+3549: 7e           ld   a,(hl)
+354a: b7           or   a
+354b: c8           ret  z
+354c: fe 22        cp   $22
+354e: c2 97 19     jp   nz,$1997
+3551: d7           rst  $10
+3552: c9           ret
+3553: 3e 20        ld   a,$20
+3555: 12           ld   (de),a
+3556: 13           inc  de
+3557: 10 fc        djnz $3555
+3559: 18 ee        jr   $3549
+
+;---------------------------
+; ASCII MESSAGES
+;
+
+355b: 0d 55 54 49 4c 20 35 2e 32    ; <CR> + "UTIL 5.2"
+
+3564: 20 52 45 41 44 59 0d 00       ; " READY" (plus carriage return + EOL)
+
+356c: 20 42 41 44 0d 00             ; " BAD" (plus carriage return + EOL)
+
+
+;---------------------------
+; Keyboard Debounce Routine:
+; 
+3572: 21 36 40     ld   hl,$4036        ; Keyboard Work area
+3575: 01 01 38     ld   bc,$3801        ; Start of Keyboard matrix Memory
+3578: 16 00        ld   d,$00
+
+Keyb_loop:
+
+357a: 0a           ld   a,(bc)          ; Load keyboard value
+357b: 5f           ld   e,a
+357c: ae           xor  (hl)            ; determine any newly-pressed/depressed keys
+357d: 73           ld   (hl),e
+357e: a3           and  e               ; zero if any are newly-pressed
+357f: 20 08        jr   nz,$3589    ; Keyb_exit
+3581: 14           inc  d
+3582: 2c           inc  l
+3583: cb 01        rlc  c
+3585: f2 7a 35     jp   p,$357A     ; Keyb_loop
+3588: c9           ret
+
+Keyb_exit:
+
+3589: 5f           ld   e,a
+358a: c5           push bc
+358b: 01 dc 05     ld   bc,$05DC        ; Count 1500 loops
+358e: cd 60 00     call $0060           ; delay = 87924 cycles (~49 milliseconds)
+3591: c1           pop  bc
+3592: 0a           ld   a,(bc)          ; read row again
+3593: a3           and  e               ; if still pressed, return
+3594: c8           ret  z
+3595: c3 fb 03     jp   $03FB           ; process key column
+
+END of Actual CODE/DATA for ROM
+
+3598-37BF: ff

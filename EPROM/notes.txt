@@ -1,0 +1,4 @@
+Select logic indicates that the EPROM is selected for the memory range:
+$3000 - $37BF
+
+Communications appears to go through port $08 (IN/OUT)
