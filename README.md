@@ -19,7 +19,7 @@ cassette system.
 ## Overview
 
 The TC-8 cassette system was a combination of software and hardware which reportedly
-improved cassette I/O speeds to 2900 baud - an over 5 times improvement !
+improved cassette I/O speeds to 2900 baud - a nearly 6-fold improvement !
 
 The hardware consisted of a box which connected to the expansion port, which managed
 both audio output/input, and the motor(s) of the casssette drive(s) - it could control
@@ -58,8 +58,8 @@ folder).
 In this folder, I will archive all of the documents available which originally came on paper:
 - Assembly instructions
 - Usage instructions
-- Sschematic diagrams
-- Aadvertising materials
+- Schematic diagrams
+- Advertising materials
 etc.
 
 ### EPROM Folder
