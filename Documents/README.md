@@ -20,6 +20,8 @@ all in this folder.
 
 | Name | Description |
 | ---- | ----------- |
+| [Accessories_Ad.pdf](Accessories_Ad.pdf) | Advertisement for accessories from JPC Products |
+| [Advertisement_TC-8.jpg](Advertisement_TC-8.jpg) | Advertisement for TC-8 |
 | [TC-8_55-68.pdf](TC-8_55-68.pdf) | Assembly manual for assembling the TC-8 as a kit (substantially complete). |
 | [TC-8_Cassette_Operating_System_Rev_4_(1980)(JPC_Products).pdf](TC-8_Cassette_Operating_System_Rev_4_(1980)(JPC_Products).pdf) | Users manual for the UTIL management system and BASIC extensions |
 | [TC-8_Main_board.pdf](TC-8_Main_board.pdf) | Schematic diagram for the main board of the TC-8 system |
