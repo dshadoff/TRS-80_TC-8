@@ -30,9 +30,11 @@ of the EPROM).
 Like any machine-language program, starting the program by stating the memory location to jump to
 is as follows:
 
-> SYSTEM<ENTER>
-> 
-> *? /(address in decimal)<ENTER>
+```
+SYSTEM<ENTER>
+
+*? /(address in decimal)<ENTER>
+```
 
 #### Main entry point
 
@@ -41,7 +43,7 @@ available, as well as instantiating keyboard debounce functionality is at 3000H.
 
 The decimal version of the address is 12288
 
-#### Second entry point
+#### Alternate entry point
 
 The alternate entry point, which just registers the extended BASIC commands and makes the high-speed cassette functions
 available (without keyboard debounce functionality), is at 3002H.
@@ -62,8 +64,7 @@ At this time, a PC Board layout has not been created in order to recreate the bo
 
 | Name | Description |
 | ---- | ----------- |
-| []() |  |
-| []() |  |
-| []() |  |
-| []() |  |
+| [UTIL-5.2_ROM.BIN](UTIL-5.2_ROM.BIN) | Extract of the contents of the EPROM from the EPROM board |
+| [TC-8_UTIL-5.2_ROM_disassembly.txt](TC-8_UTIL-5.2_ROM_disassembly.txt) | Disassembly of the ROM, for the purposes of study. Comments have been addded (still a work-in-progress) |
+| [notes.txt](notes.txt) | (work-in-progress) Notes related the disassembly |
 
