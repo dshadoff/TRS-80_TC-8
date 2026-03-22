@@ -31,6 +31,6 @@ in this folder).
 | ---- | ----------- |
 | [wav2cas.exe](wav2cas.exe) | Executable by Knut Roll-Lund to convert 500 baud programs to CAS files |
 | [wav2cas.txt](wav2cas.txt) | Instructions for the above program |
-| [tc8_util-4_1.wav](tc8_util-4_1.wav) | Recording of the "UTIL" program (TC-8's control program), Version 4.1 |
+| [tc8_util-4_1.wav](tc8_util-4_1.wav) | Recording of the "UTIL" program (TC-8's control program), Version 4.1 (500 baud Model I format) |
 | [tc8_util-4_1.cas](tc8_util-4_1.cas) | Emulator-loadable version of the same |
 

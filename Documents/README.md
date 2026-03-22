@@ -10,11 +10,17 @@ TC-8, but many other TRS-80 items as well (In France !):
 
 https://prof-80.fr/index.php/tc-8-jpc-products-company
 
+## Datasheets Folder:
+
+One of the documents below contains a schematic diagram and parts list for the TC-8 system;
+I have compiled datasheets for each of the main parts used in the system, and placed them
+all in this folder.
+
 ## Contents:
 
 | Name | Description |
 | ---- | ----------- |
-| [TC-8_55-68.pdf](TC-8_55-68.pdf) | Excerpt from the assembly manual for assembling the TC-8 as a kit. |
+| [TC-8_55-68.pdf](TC-8_55-68.pdf) | Assembly manual for assembling the TC-8 as a kit (substantially complete). |
 | [TC-8_Cassette_Operating_System_Rev_4_(1980)(JPC_Products).pdf](TC-8_Cassette_Operating_System_Rev_4_(1980)(JPC_Products).pdf) | Users manual for the UTIL management system and BASIC extensions |
 | [TC-8_Main_board.pdf](TC-8_Main_board.pdf) | Schematic diagram for the main board of the TC-8 system |
 
