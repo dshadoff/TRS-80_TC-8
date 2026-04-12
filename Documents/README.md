@@ -21,13 +21,29 @@ all in this folder.
 
 ## Contents:
 
+### Manuals:
+
 | Name | Description |
 | ---- | ----------- |
-| [Accessories_Ad.pdf](Accessories_Ad.pdf) | Advertisement for accessories from JPC Products |
-| [Advertisement_TC-8.jpg](Advertisement_TC-8.jpg) | Advertisement for TC-8 |
+| [TC-8_Main_board.pdf](TC-8_Main_board.pdf) | Schematic diagram for the main board of the TC-8 system |
 | [TC-8_Users_Manual_Assembly.pdf](TC-8_Users_Manual_Assembly.pdf) | Assembly manual for assembling the TC-8 as a kit |
 | [TC-8_Users_Manual_Usage.pdf](TC-8_Users_Manual_Usage.pdf) | Users manual for the UTIL management system and BASIC extensions |
 | [TC-8_EP-38_EPROM_Board.pdf](TC-8_EP-38_EPROM_Board.pdf) | Users manual for the EP-38 EPROM Board, including many technical details |
 | [TC-8_FASTED.pdf](TC-8_FASTED.pdf) | Users manual for the FASTED patches for EDTASM, to use TC-8 for I/O |
-| [TC-8_Main_board.pdf](TC-8_Main_board.pdf) | Schematic diagram for the main board of the TC-8 system |
+
+
+### Advertisements:
+
+| Name | Description |
+| ---- | ----------- |
+| [Accessories_Ad.pdf](Accessories_Ad.pdf) | Advertisement for accessories from JPC Products |
+| [Advertisement_TC-8.jpg](Advertisement_TC-8.jpg) | Advertisement for TC-8 |
+
+
+### Miscellaneous:
+
+| Name | Description |
+| ---- | ----------- |
+| [TC-8_Purchase_19810627.jpg](TC-8_Purchase_19810627.jpg) | Receipt for purchase of TC-8 in 1981 |
+| [EP-38_Purchase_19821016.jpg](EP-38_Purchase_19821016.jpg) | Receipt for purchase of EP-38 board in 1982 |
 
