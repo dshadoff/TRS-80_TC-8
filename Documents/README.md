@@ -32,12 +32,16 @@ all in this folder.
 | [TC-8_FASTED.pdf](TC-8_FASTED.pdf) | Users manual for the FASTED patches for EDTASM, to use TC-8 for I/O |
 
 
-### Advertisements:
+### Advertisements in 80 Microcomputing Magazine:
+
+[Advertisements](Advertisements)
+
+
+### Advertisements sent to owners:
 
 | Name | Description |
 | ---- | ----------- |
 | [Accessories_Ad.pdf](Accessories_Ad.pdf) | Advertisement for accessories from JPC Products |
-| [Advertisement_TC-8.jpg](Advertisement_TC-8.jpg) | Advertisement for TC-8 |
 
 
 ### Miscellaneous:
