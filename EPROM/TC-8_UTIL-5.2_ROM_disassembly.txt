@@ -17,14 +17,14 @@
 ;
 3000: 18 1b        jr   $301D           ; Entry point including keyboard debounce routine
 3002: c3 23 30     jp   $3023           ; Main entry point
-3005: c3 1a 34     jp   $341A
-3008: c3 2b 34     jp   $342B
-300b: c3 68 34     jp   $3468
-300e: c3 73 34     jp   $3473
+3005: c3 1a 34     jp   $341A       ; MOTOR_ON
+3008: c3 2b 34     jp   $342B       ; GETID
+300b: c3 68 34     jp   $3468       ; GETID2
+300e: c3 73 34     jp   $3473       ; RFILE
 3011: c3 20 34     jp   $3420       ; MOTOR_OFF
-3014: c3 a4 32     jp   $32A4
-3017: c3 c3 32     jp   $32C3
-301a: c3 72 35     jp   $3572
+3014: c3 a4 32     jp   $32A4       ; WRTID
+3017: c3 c3 32     jp   $32C3       ; WRFILE
+301a: c3 72 35     jp   $3572       ; KBFIX
 301d: 21 72 35     ld   hl,$3572        ; Address of keyboard driver routine
 3020: 22 16 40     ld   ($4016),hl      ; inject into keyboard driver address (in keyboard DCB)
 3023: 21 9f 30     ld   hl,$309F        
@@ -326,6 +326,7 @@ TC8_LSET:
 3291: fa 97 19     jp   m,$1997
 3294: c9           ret
 
+; write lead-in (
 3295: cd 1a 34     call $341A
 3298: 11 ff 1f     ld   de,$1FFF
 329b: cd 02 33     call $3302
@@ -335,6 +336,9 @@ TC8_LSET:
 32a1: 20 f8        jr   nz,$329B
 32a3: c9           ret
 
+;
+; WRTID:
+; ------
 32a4: 21 60 40     ld   hl,$4060
 32a7: 22 71 40     ld   ($4071),hl
 32aa: cd 95 32     call $3295
@@ -347,6 +351,9 @@ TC8_LSET:
 32bf: 2a 5b 40     ld   hl,($405B)
 32c2: c9           ret
 
+;
+; WRFILE:
+; -------
 32c3: cd 10 33     call $3310           ; output a bit
 32c6: 16 b3        ld   d,$B3           ; write byte $b3
 32c8: cd ea 32     call $32EA
@@ -371,40 +378,43 @@ TC8_LSET:
 ; ------------------------
 ;
 32ea: 0e 08        ld   c,$08       ; sequence through 8 bits
-32ec: cd 10 33     call $3310       ; start bit ?
+32ec: cd 10 33     call $3310       ; write start bit - delay for base 177 cycles
 32ef: cb 42        bit  0,d         ; is LSB set ?
 32f1: 28 05        jr   z,$32F8
-32f3: cd 10 33     call $3310       ; if LSB is '1'
+32f3: cd 10 33     call $3310       ; if LSB is '1', do it again (second half-wave)
 32f6: 18 03        jr   $32FB
-32f8: cd 05 33     call $3305       ; if LSB is '0'
+
+32f8: cd 05 33     call $3305       ; if LSB is '0' - delay for additional 350 cycles (1/5086 sec)
 32fb: 0d           dec  c           ; next bit
 32fc: 28 0b        jr   z,$3309     ; all bits done
-32fe: cb 0a        rrc  d           ; otherwise next bit
-3300: 18 ea        jr   $32EC       
-3302: cd 10 33     call $3310
+32fe: cb 0a        rrc  d           ; (8) otherwise next bit
+3300: 18 ea        jr   $32EC       ; (12)
 
-3305: 06 18        ld   b,$18       ; delay length = 24 iterations
-3307: 18 17        jr   $3320
+3302: cd 10 33     call $3310       ; write a bit - and add delay to make it a '0'
 
-3309: cd 10 33     call $3310       ; all bits done
-330c: 06 10        ld   b,$10       ; delay length = 16 iterations
+3305: 06 18        ld   b,$18       ; (4)  Delay length = 24 iterations (logical '0')
+3307: 18 17        jr   $3320       ; (12)
+
+3309: cd 10 33     call $3310       ; all bits done - add one more bit
+330c: 06 10        ld   b,$10       ; delay length = 16 iterations - delay for additional 229 cycles (1/7773 sec)
 330e: 18 10        jr   $3320
 
 ;
 ; Output a bit
 ; ------------
 ;
-3310: 06 0e        ld   b,$0E       ; delay length = 14 iterations
-3312: fd 7e 1d     ld   a,(iy+$1d)
+3310: 06 0e        ld   b,$0E       ; delay length = 14 iterations  (baseline wait duration, for a '1') (177 cycles, 1/10000 sec)
+3312: fd 7e 1d     ld   a,(iy+$1d)  ; status of output bit for audio
 3315: 2f           cpl
-3316: e6 01        and  $01
-3318: fd 77 1d     ld   (iy+$1d),a
-331b: fd b6 1c     or   (iy+$1c)
+3316: e6 01        and  $01         ; negate that one bit
+3318: fd 77 1d     ld   (iy+$1d),a  ; and store negated value
+331b: fd b6 1c     or   (iy+$1c)    ; motor sense values
 331e: d3 08        out  ($08),a
-3320: 10 fe        djnz $3320       ; countdown loop
-3322: c9           ret
+3320: 10 fe        djnz $3320       ; (13/8) countdown loop
+3322: c9           ret              ; (10)
 
-TC8_SAVE:
+;TC8_SAVE:
+;--------
 3323: cd c8 33     call $33C8
 3326: 11 52 40     ld   de,$4052
 3329: cd 34 35     call $3534           ; get filename into $4052
@@ -507,12 +517,16 @@ TC8_LOAD:
 3410: fd 36 00 20  ld   (iy+$00),$20
 3414: 21 50 40     ld   hl,$4050
 3417: c3 a7 28     jp   $28A7               ; Message output
+;
+; MOTOR_ON
+;----------
 341a: f3           di
 341b: fd 7e 1c     ld   a,(iy+$1c)
 341e: 18 02        jr   $3422
 
 ;-----------------------------
-MOTOR_OFF:
+; MOTOR_OFF:
+; ----------
 
 3420: 3e ff        ld   a,$FF
 3422: d3 08        out  ($08),a
@@ -522,7 +536,8 @@ MOTOR_OFF:
 3427: c8           ret  z
 3428: cd 0c 34     call $340C
 
-
+; GETID:
+; ------
 342b: fd 36 1f 9d  ld   (iy+$1f),$9D
 342f: 21 60 40     ld   hl,$4060            ; filename requested
 3432: 22 71 40     ld   ($4071),hl
@@ -534,9 +549,9 @@ MOTOR_OFF:
 3443: cd fa 34     call $34FA               ; get next byte
 3446: fe 9d        cp   $9D                 ; $9d = type ?
 3448: 20 e1        jr   nz,$342B            ; if not $9D, start over
-344a: cd 7a 34     call $347A
+344a: cd 7a 34     call $347A   ; not sure
 344d: d8           ret  c
-344e: 06 09        ld   b,$09
+344e: 06 09        ld   b,$09               ; filename check
 3450: 21 51 40     ld   hl,$4051
 3453: 11 61 40     ld   de,$4061
 3456: 1a           ld   a,(de)
@@ -549,12 +564,17 @@ MOTOR_OFF:
 3464: 23           inc  hl
 3465: 13           inc  de
 3466: 10 ee        djnz $3456
+;
+; GETID2:
+; -------
 3468: 2a 5d 40     ld   hl,($405D)
 346b: 22 71 40     ld   ($4071),hl
 346e: 2a 5b 40     ld   hl,($405B)
 3471: 05           dec  b
 3472: c9           ret
-
+;
+; RFILE:
+; ------
 3473: fd 36 1f 00  ld   (iy+$1f),$00        ; clear out checksum to start
 3477: cd c1 34     call $34C1
 
@@ -582,7 +602,7 @@ MOTOR_OFF:
 34ab: df           rst  $18         ; compare de:hl  (return Z flg if eq; c flag if DE>HL)
 34ac: eb           ex   de,hl
 34ad: 20 d0        jr   nz,$347F
-34af: cd fa 34     call $34FA
+34af: cd fa 34     call $34FA       ; read a byte
 34b2: fd be 1f     cp   (iy+$1f)
 34b5: dd 36 02 5b  ld   (ix+$02),$5B
 34b9: c8           ret  z
@@ -591,6 +611,9 @@ MOTOR_OFF:
 34bf: 37           scf
 34c0: c9           ret
 
+;
+; Read in leader (zero bits) until a short bit appears
+;
 34c1: cd 10 35     call $3510       ; read a bit
 34c4: cd 10 35     call $3510       ; read a bit
 34c7: f2 c4 34     jp   p,$34C4     ; continue reading bits until ' cp $0E ' returns negative  (i.e. A < $0E)
