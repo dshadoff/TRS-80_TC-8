@@ -252,11 +252,16 @@ TC8_CLOSE:
 31fd: cd c3 32     call $32C3
 3200: c3 87 31     jp   $3187
 
-TC8_GET:
+;
+;TC8_GET - load a binary program (GUT "<FILENAME>")
+;--------
 3203: cd 33 32     call $3233
 3206: c3 56 33     jp   $3356
 
-TC8_PUT:
+;
+;TC8_PUT - save a binary program (PUT "<FILENAME>" <BEGIN>,<END>,<TRANSFER>)
+; filetype '%'
+;--------
 3209: cd 33 32     call $3233
 320c: 11 52 40     ld   de,$4052
 320f: cd 34 35     call $3534
@@ -269,8 +274,9 @@ TC8_PUT:
 321f: cd c8 33     call $33C8
 3222: fd 36 1e 20  ld   (iy+$1e),$20
 3226: 18 de        jr   $3206
-
-TC8_LSET:
+;
+;TC8_LSET:
+;---------
 3228: cd c8 33     call $33C8
 322b: cd 1a 34     call $341A
 322e: cd e9 34     call $34E9
