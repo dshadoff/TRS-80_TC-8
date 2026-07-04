@@ -79,6 +79,7 @@ Byte #19 = 0xEC (checksum, match against 0xEC)
 ```
 
 This is followed by a data dump of the actual program data.
+
 **PROGRAM DATA (excerpt)**:
 ```
 Found second leader and start bit
