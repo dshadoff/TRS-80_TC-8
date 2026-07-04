@@ -76,3 +76,13 @@ there have been any errors during reading/writing.
 The checksum is calculated by adding the values of bytes #2 through #18, and using only the
 least-significant byte of this sum for comparison against the checksum.
 
+Test Table:
+
+| Bytes | Usage | Description |
+|-------|-------|-------------|
+| 01-02 | Sync Bytes | The lead-in is followed by a sync byte of 0xB3 ('Byte 01'), and then a follow-up byte of 0x9D ("Byte 02"), to ensure that the following data is actually a file that can be trusted.  If either of these bytes is read in with a different value, the reading program will simply revert back to trying to read in the lead-in from the start (a long train of zeroes terminated by a short half-wave). |
+| 03 | File Type | The next byte to be read identifies which type of file it is:<br>0x24 = BASIC<br>0x25 = BINARY/Machine-language<br>0x26 = Source Code (i.e. EDTASM source) |
+| 04 | Filename | The filename for the file on tape can be up to 8 characters in length, stored in ASCII, and with trailing spaces if the name is shorted than 8 characters. |
+
+
+
