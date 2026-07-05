@@ -18,7 +18,7 @@ slightly better frequency response than AM radio: perhaps 40Hz-10,000Hz.
 **Volume**: Since recording may be made at different levels, and there is no objective way to observe/measure
 signal output from the cassette player, the input to the system should be able to properly read a signal from
 a wide range of output levels.  *This is a major failing of the original TRS-80 Model I circuitry, as it was
-notoriously sensitive to vaolume levels*.
+notoriously sensitive to volume levels*.
 
 **Dropouts**: Inconsistent application of the ferric oxide particles often caused volume level variations
 during playback. Here is a real example of one, excountered on a cassette I was making a WAV file of:
@@ -42,7 +42,7 @@ as recording and playback levels.
 line current, with an internal AC-to-DC power supply. Some supplies are better than others, and sometimes
 the 60Hz ripple from the power supply can be heard as a faint source of background noise. Radio Shack's
 "TRS-80 Micro Computer Technical Reference Handbook" seemed to indicate that Radio Shack was very concerned
-that the volumne level of this 60Hz hum would be a major influence in the audio signal and therefore a major
+that the volume level of this 60Hz hum would be a major influence in the audio signal and therefore a major
 worry (however, I didn't find this to be so severe).
 
 **Internal Noise Sources**: Cassette recorders have additional internal sources of noise, such as the motor
@@ -73,22 +73,23 @@ no longer appears to be a squarewave, due to the limited frequency response of t
 ![Individual TRS-80 bits](../images/TRS-80-Mod1_500_44.1KHz_samples.JPG)
 
 The pulses include both a descending and an ascending pulse (below and above the midway line), fulfilling
-the polarity requirement. These pulses are approximately 450 microseconds wide. The delay between clock pulses is
-roughly 2 milliseconds, or 1 millisecond in the case of the '1' bit between clocks.
+the polarity requirement. Based on ROM disassemblies, these pulses are each approximately 450 microseconds
+wide. The delay between clock pulses is roughly 2 milliseconds, or 1 millisecond in the case of the '1' bit
+between clocks.
 
 On playback, the clock pulses need to exceed a threshold voltage, in order to trigger a flip-flop to hold
-that value until deliverately reset. This is almost certainly the reason for the over-sensitivity of the TRS-80
+that value until deliberately reset. This is almost certainly the reason for the over-sensitivity of the TRS-80
 to volume levels.
 
 The program which reads these pulses:
-1. Checks for the flip-flop value to have been triggered (and wait until it is triggered)
-2. Resets the flip-flop, waits roughly 1 millisecond (by counting machine cycles), and checks the flip-flop again (midway), deciding whether this is a '0' or '1' bit
-3. Reset the flip-flop once again and waits for the remainder of the cycle, to synchronize with the next clock pulse
+1. Checks for the flip-flop value to have been triggered (or wait until it is triggered)
+2. Resets the flip-flop, waits roughly 1 millisecond (by counting machine cycles), and checks the flip-flop again (midway between clock pulses), to determine whether this is a '0' or '1' bit
+3. Resets the flip-flop once again and waits for the remainder of the cycle, to synchronize with the next clock pulse
 
 #### TRS-80 Native Format - Assembling Bits into Bytes
 
 In order to assemble bits into bytes, two things must happen:
-1. Synchronization, and
+1. Synchronization of bits at the byte boundary, and
 2. Agreement of bit sequence
 
 In order to synchronize, the start of a file begins with a series of 256 zeroes, followed by a 0xA5 byte.
@@ -140,7 +141,7 @@ From here, files for BASIC or machine-language data/programs have different form
 
 ### TC-8 Format
 
-Of course, every file can be decomposed into bytes, and bytes need to be serialized into a series of bits.
+As stated above, every file can be decomposed into bytes, and bytes need to be serialized into a series of bits.
 The most basic format of storage on cassettes must be a bit, and from there, a more comprehensive protocol
 must be constructed.
 
@@ -164,8 +165,8 @@ fullwaves ('1' values).
 
 #### TC-8 Format - Assembling Bits into Bytes
 
-In order to assemble bits into bytes, two things must happen (as mentioned above for TRS-80 format):
-1. Synchronization, and
+As stated above for the TRS-80 format, in order to assemble bits into bytes, two things must happen:
+1. Synchronization of bits at the byte boundary, and
 2. Agreement of bit sequence
 
 In order to synchronize, the start of a file begins with a series of many long (zero) halfwaves, followed by a
