@@ -5,48 +5,137 @@
 Cassette tapes were chosen as a recording medium in the late 1970s because of how common and inexpensive they
 had become by then - NOT because of their fidelity or recording quality.
 
-### Problems with cassettes:
+### Considerations when using cassettes:
+
+Any medium for recording required consideration of the nature of analog cassette recording, espeically on
+the type of devices employed for this purpose.  The following are a few of those considerations:
 
 **Frequency Response**: While cassettes were beginning to become HiFi/stereo equipment around this time,
 the units they chose for computers were portable low-cost units with much lower fidelity. And people were
 interested in buying the least expensive casssettes that would work. Assume, for minimum standards, a
 slightly better frequency response than AM radio: perhaps 40Hz-10,000Hz.
 
+**Volume**: Since recording may be made at different levels, and there is no objective way to observe/measure
+signal output from the cassette player, the input to the system should be able to properly read a signal from
+a wide range of output levels.  *This is a major failing of the original TRS-80 Model I circuitry, as it was
+notoriously sensitive to vaolume levels*.
+
 **Dropouts**: Inconsistent application of the ferric oxide particles often caused volume level variations
-during playback.
+during playback. Here is a real example of one, excountered on a cassette I was making a WAV file of:
 
 ![Picture of a dropout](../images/TRS-80-Mod1_TC-8_Dropout.JPG)
 
+**Motor Speed**: While cassettes players were intended to run at the same, consistent speed as other
+recorders/players, it was possible for the speed to vary by a few percent, especially on the low-cost
+portable versions which were employed with computers. So any recording format should be able to deal
+with a +/-5% variance in pitch/speed.
 
-### Background Noise
+**Polarity**: It may be possible that a recording deck and a playback deck may not represent the signal with
+the same polarity, so the signal should be readable whether written in the same orientation as written, or
+whether inverted.
 
-Along with the limitations in frequency response, the amplifier stage in the cassette recorder may have a
-certain level of noise during ampliification. Noise is also dependent on the actual recording and playback
-levels - lower reqording levels could have a perceptible background noise level, whereas higher recording
-and playback levels may seem to have a lower level of background noise. But too much amplification could lead
-to distortion (also noise, but a differnt type).
+**Background Noise**: There is noise in all analog electronics, and clearly the signal needs to be larger
+than the noise. Maximizing this signal-to-noise ratio can depend on the type of signal being saved, as well
+as recording and playback levels.
 
-### Dropouts
+**60Hz Line Hum**: As the tape recorder is expected to always be available, these were generally powered by
+line current, with an internal AC-to-DC power supply. Some supplies are better than others, and sometimes
+the 60Hz ripple from the power supply can be heard as a faint source of background noise. Radio Shack's
+"TRS-80 Micro Computer Technical Reference Handbook" seemed to indicate that Radio Shack was very concerned
+that the volumne level of this 60Hz hum would be a major influence in the audio signal and therefore a major
+worry (however, I didn't find this to be so severe).
 
-Cassette tapes of this era were not always 100% consistent with how the magnetic particles were applied (or
-how well they stayed attached to the tape). It was not uncommon for tapes - especiall lower-quality tapes - to
-have vaolume levels which suddenly dropped for no apparnet reason (and then recovered).
+**Internal Noise Sources**: Cassette recorders have additional internal sources of noise, such as the motor
+noise, and vibrations caused by moving parts. Again, these aren't major factors, but are considerations to
+be taken into account.
 
 
-### 60Hz Line Hum
-
-
-## Overview
-
-### Filetypes
-
-### Commands
-
-## Tape Format
+## Tape Formats
 
 ### Bit-level Encoding
 
-#### TRS-80 Native Format
+Of course, every file can be decomposed into bytes, and bytes need to be serialized into a series of bits.
+The most basic format of storage on cassettes must be a bit, and from there, a more comprehensive protocol
+must be constructed.
+
+#### TRS-80 Native Format - Bit-Level Encoding
+
+At the lowest level, the TRS-80 Model 1 wrote bits to tape using pulses. The pulses formed a timebase,
+with a separation of 2 milliseconds as a "clock" of sorts; the presence of an additional pulse midway between two
+clock pulses (roughly at the 1ms mark) indicated a '1' bit, and the abscence of that additional pulse
+indicated a '0' bit.  This 2 millisecond 'clock' is how the "500 baud" speed is derived.
+
+The following image shows the timebase, and two '1' bits toward the right edge - notice how the waveform
+no longer appears to be a squarewave, due to the limited frequency response of the medium:
+
+![Picture of several TRS-80 bits](../images/TRS-80-Mod1_500_macro.JPG)
+
+The pulses include both a descending and an ascending pulse (below and above the midway line), fulfilling
+the polarity requirement. These pulses are approximately 450 microseconds wide. The delay between clock pulses is
+roughly 2 milliseconds, or 1 millisecond in the case of the '1' bit between clocks.
+
+On playback, the clock pulses need to exceed a threshold voltage, in order to trigger a flip-flop to hold
+that value until deliverately reset. This is almost certainly the reason for the over-sensitivity of the TRS-80
+to volume levels.
+
+The program which reads these pulses:
+1. Checks for the flip-flop value to have been triggered (and wait until it is triggered)
+2. Resets the flip-flop, waits roughly 1 millisecond (by counting machine cycles), and checks the flip-flop again (midway), deciding whether this is a '0' or '1' bit
+3. Reset the flip-flop once again and waits for the remainder of the cycle, to synchronize with the next clock pulse
+
+#### TRS-80 Native Format - Assembling Bits into Bytes
+
+In order to assemble bits into bytes, two things must happen:
+1. Synchronization, and
+2. Agreement of bit sequence
+
+In order to synchronize, the start of a file begins with a series of 256 zeroes, followed by a 0xA5 byte.
+The bit sequence for TRS-80 format is most-significant bit first, so the bits for the 0zA5 byte are: 10100101 .
+It is significant that the first bit of this sync byte is non-zero.
+
+#### TRS-80 Native Format - Overall Tape Protocol
+
+From here, files for BASIC or machine-language data/programs have different formats:
+
+**BASIC DATA FILES**
+
+| Bytes | Usage | Description |
+|-------|-------|-------------|
+| -- | Lead-In | The lead-in consists of 256 iterations of '0' bits. This is followed by the sync byte |
+| 01 | Sync Byte | The lead-in is followed by a sync byte of 0xA5 ('Byte 01') |
+| 02- | Data Bytes | BASIC Data Files are structured in the way that the user's program requires |
+
+**BASIC PROGRAMS**
+
+| Bytes | Usage | Description |
+|-------|-------|-------------|
+| -- | Lead-In | The lead-in consists of 256 iterations of '0' bits. This is followed by the sync byte. |
+| 01 | Sync Byte | The lead-in is followed by a sync byte of 0xA5 ('Byte 01'). |
+| 02-04 | Header | The BASIC Header is 3 bytes of value 0xD3. |
+| 05 | Filename | The BASIC Program Name consists of only one letter. |
+| 06-EOF | Program | The BASIC Program is stored as a linked list of null-terminated strings of BASIC tokens and text. |
+| EOF | EOF Marker | The end of the BASIC program is marked by 3 0x00 bytes. |
+
+**MACHINE-LANGUAGE PROGRAMS**
+
+| Bytes | Usage | Description |
+|-------|-------|-------------|
+| -- | Lead-In | The lead-in consists of 256 iterations of '0' bits. This is followed by the sync byte. |
+| 01 | Sync Byte | The lead-in is followed by a sync byte of 0xA5 ('Byte 01'). |
+| 02 | File Type | The file type for a machine-language program is 0x55. |
+| 03-08 | Filename | The filename for the file on tape can be up to 6 characters in length, stored in ASCII, and with trailing spaces if the name is shorted than 6 characters. |
+| 09-?? | DATABLOCK | There can be one or more datablocks in the file. |
+| **DATABLOCK FORMAT** |
+| 01 | Block Type | This is 0x3C for binary data |
+| 02 | No. of Bytes | Number of bytes in block. '0x00' implies 256; other values are as stated (i.e. 0x05 = 5) |
+| 03-04 | Load Address | This is where the data is to be loaded, least-significant byte first. (i.e. 0x00 0x4B = 0x4B00). Blocks do not need to be contiguous, but most of the time they are. |
+| 05-nn | Data | Bytes to load |
+| EOB | Checksum value to validate whether data loaded was correct |
+| **END OF FILE BLOCK** |
+| 01 | Block type | This is 0x78 to indicate transfer address. |
+| 02-03 | Transfer Address | This is where execution is to start, least-significant byte first. (i.e. 0x00 0x4B = 0x4B00). |
+
+
 
 #### TC-8 Format
 
