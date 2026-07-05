@@ -78,8 +78,8 @@ wide. The delay between clock pulses is roughly 2 milliseconds, or 1 millisecond
 between clocks.
 
 On playback, the clock pulses need to exceed a threshold voltage, in order to trigger a flip-flop to hold
-that value until deliberately reset. This is almost certainly the reason for the over-sensitivity of the TRS-80
-to volume levels.
+that value until deliberately reset. This flip-flop threshold voltage is almost certainly the reason for
+the over-sensitivity of the TRS-80 to volume levels.
 
 The program which reads these pulses:
 1. Checks for the flip-flop value to have been triggered (or wait until it is triggered)
@@ -93,8 +93,8 @@ In order to assemble bits into bytes, two things must happen:
 2. Agreement of bit sequence
 
 In order to synchronize, the start of a file begins with a series of 256 zeroes, followed by a 0xA5 byte.
-The bit sequence for TRS-80 format is most-significant bit first, so the bits for the 0zA5 byte are: 10100101 .
-It is significant that the first bit of this sync byte is non-zero.
+The bit sequence for TRS-80 format is most-significant bit first, so the bits for the 0xA5 byte are written
+in the sequence: 10100101 .  It is significant that the first bit of this sync byte is non-zero.
 
 #### TRS-80 Native Format - Overall Tape Protocol
 
@@ -106,7 +106,7 @@ From here, files for BASIC or machine-language data/programs have different form
 |-------|-------|-------------|
 | -- | Lead-In | The lead-in consists of 256 iterations of '0' bits. This is followed by the sync byte |
 | 01 | Sync Byte | The lead-in is followed by a sync byte of 0xA5 ('Byte 01') |
-| 02- | Data Bytes | BASIC Data Files are structured in the way that the user's program requires |
+| 02- | Data Bytes | BASIC Data Files are structured in whatever way the user's program requires |
 
 **BASIC PROGRAMS**
 
@@ -127,12 +127,12 @@ From here, files for BASIC or machine-language data/programs have different form
 | 01 | Sync Byte | The lead-in is followed by a sync byte of 0xA5 ('Byte 01'). |
 | 02 | File Type | The file type for a machine-language program is 0x55. |
 | 03-08 | Filename | The filename for the file on tape can be up to 6 characters in length, stored in ASCII, and with trailing spaces if the name is shorted than 6 characters. |
-| 09-?? | DATABLOCK | There can be one or more datablocks in the file. |
+| 09-?? | DATABLOCK | There can be one or more datablocks in the file (minimum one). |
 | |  **DATABLOCK FORMAT**: | |
 | 01 | Block Type | This is 0x3C for binary data |
 | 02 | No. of Bytes | Number of bytes in block. '0x00' implies 256; other values are as stated (i.e. 0x05 = 5) |
-| 03-04 | Load Address | This is where the data is to be loaded, least-significant byte first. (i.e. 0x00 0x4B = 0x4B00). Blocks do not need to be contiguous, but most of the time they are. |
-| 05-nn | Data | Bytes to load |
+| 03-04 | Load Address | This is where the data is to be loaded, least-significant byte first. (i.e. 0x00 0x4B = 0x4B00). Blocks do not need to be contiguous, but generally are continguous. |
+| 05-nn | Data | Data bytes to load |
 | EOB | Checksum value to validate whether data loaded was correct |
 | | **END OF FILE BLOCK**: | |
 | 01 | Block type | This is 0x78 to indicate transfer address. |
@@ -151,12 +151,13 @@ At the lowest level, the TC-8 writes bits to tape with half-waves.
 
 The TC-8 hardware adds a zero-crossing comparator, and checks for the timing of waveform zero-crossing, instead
 of hitting a volume threshold. Zero-crossing is MUCH less sensitive to absolute volume levels, and also works
-with eith polarity, since zero-crossing from positive to negative is treated the same as zero-crossing from
+with either polarity, since zero-crossing from positive to negative is treated the same as zero-crossing from
 negative to positive.
 
 * A '0' is represented by a 'long' halfwave (either positive or negative) of roughly 370 microseconds.
 * A '1' is represented by two 'short' halfwaves, each with a duration of roughly 170 microsoeconds, for a
 total of roughly 340 micrososeconds.
+* An inter-byte gap is represented by a 'long' halfwave (either positive or negative) of roughly 370 microseconds.
 
 The following image shows several long ('0') halfwaves, followed by a short (sync) halfwave, and two short
 fullwaves ('1' values).
