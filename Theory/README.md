@@ -157,7 +157,6 @@ negative to positive.
 * A '0' is represented by a 'long' halfwave (either positive or negative) of roughly 370 microseconds.
 * A '1' is represented by two 'short' halfwaves, each with a duration of roughly 170 microsoeconds, for a
 total of roughly 340 micrososeconds.
-* An inter-byte gap is represented by a 'long' halfwave (either positive or negative) of roughly 370 microseconds.
 
 The following image shows several long ('0') halfwaves, followed by a short (sync) halfwave, and two short
 fullwaves ('1' values).
@@ -166,9 +165,17 @@ fullwaves ('1' values).
 
 #### TC-8 Format - Assembling Bits into Bytes
 
-As stated above for the TRS-80 format, in order to assemble bits into bytes, two things must happen:
+As stated above for the TRS-80 format, in order to assemble bits into bytes, some things must happen:
 1. Synchronization of bits at the byte boundary, and
 2. Agreement of bit sequence
+3. Any inter-byte processing that is necessary
+
+NOTE:<P>
+An inter-byte gap is represented by a 'long' halfwave (either positive or negative) of roughly 370 microseconds.
+It is important to note that there is an additional bit (a '0' or long halfwave) following each byte in the file,
+as there are some calculations which need to take place following each byte, which would likely exceed the time
+needed to detect a short halfwave, potentially causing a misread.  This additional bit is essentially made to be
+ignored and thrown away. 
 
 In order to synchronize, the start of a file begins with a series of many long (zero) halfwaves, followed by a
 single short halfwave (not a full '1' wave). This is then followed by a 0xB3 sync byte (10110011 binary).
@@ -183,7 +190,7 @@ In this example:
 4. The lowercase 'x' denotes the single long halfwave used as an inter-byte separator.
 
 
-#### File Level - Overall Tape Protocol - BINARY
+#### TC-8 Format - Overall Tape Protocol - BINARY
 
 Binary files are saved as two consecutive blocks, each with it own leader & sync byte:
 
@@ -192,7 +199,7 @@ Binary files are saved as two consecutive blocks, each with it own leader & sync
 | Bytes | Usage | Description |
 |-------|-------|-------------|
 | -- | Lead-In | The lead-in consists of 0x2000 iterations of '0' bits (long halfwave) - just over 3 seconds. This is followed by a single short halfwave as a sync bit. |
-| 01-02 | Sync Bytes | The lead-in is followed by a sync byte of 0xB3 ('Byte 01'), and then a follow-up byte of 0x9D ("Byte 02"), to ensure that the following data is actually a file that can be trusted.  If either of these bytes is read in with a different value, the reading program will simply revert back to trying to read in the lead-in from the start (a long train of zeroes terminated by a short half-wave).<P>It is important to note that there is an additional bit (a '0' or long halfwave) following each byte in the file, as there are some calculations which need to take place following each byte, which would likely exceed the time needed to detect a short halfwave, potentially causing a misread.  This additional bit is essentially made to be ignored and thrown away. |
+| 01-02 | Sync Bytes | The lead-in is followed by a sync byte of 0xB3 ('Byte 01'), and then a follow-up byte of 0x9D ("Byte 02"), to ensure that the following data is actually a file that can be trusted.  If either of these bytes is read in with a different value, the reading program will simply revert back to trying to read in the lead-in from the start (a long train of zeroes terminated by a short half-wave). |
 | 03 | File Type | The next byte to be read identifies which type of file it is:<br>0x24 = BASIC<br>0x25 = BINARY/Machine-language<br>0x26 = Source Code (i.e. EDTASM source) |
 | 04-11 | Filename | The filename for the file on tape can be up to 8 characters in length, stored in ASCII, and with trailing spaces if the name is shorted than 8 characters. |
 | 12 | Zero Byte | Byte 12 is intended to be a zero.  Perhaps this is intended to act as a filename terminator (unclear). |
