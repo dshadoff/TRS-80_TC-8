@@ -171,7 +171,7 @@ As stated above for the TRS-80 format, in order to assemble bits into bytes, som
 3. Any inter-byte processing that is necessary
 
 NOTE:<P>
-An inter-byte gap is represented by a 'long' halfwave (either positive or negative) of roughly 370 microseconds.
+An inter-byte gap is represented by a 'long' halfwave (either positive or negative) of roughly 370 microseconds.<br>
 It is important to note that there is an additional bit (a '0' or long halfwave) following each byte in the file,
 as there are some calculations which need to take place following each byte, which would likely exceed the time
 needed to detect a short halfwave, potentially causing a misread.  This additional bit is essentially made to be
