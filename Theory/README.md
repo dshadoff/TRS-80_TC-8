@@ -7,7 +7,7 @@ had become by then - NOT because of their fidelity or recording quality.
 
 ### Considerations when using cassettes:
 
-Any medium for recording required consideration of the nature of analog cassette recording, espeically on
+Any medium for recording required consideration of the nature of analog cassette recording, especially on
 the type of devices employed for this purpose.  The following are a few of those considerations:
 
 **Frequency Response**: While cassettes were beginning to become HiFi/stereo equipment around this time,
