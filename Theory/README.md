@@ -5,6 +5,8 @@
 Cassette tapes were chosen as a recording medium in the late 1970s because of how common and inexpensive they
 had become by then - NOT because of their fidelity or recording quality.
 
+### Problems with cassettes:
+
 **Frequency Response**: While cassettes were beginning to become HiFi/stereo equipment around this time,
 the units they chose for computers were portable low-cost units with much lower fidelity. And people were
 interested in buying the least expensive casssettes that would work. Assume, for minimum standards, a
@@ -13,7 +15,7 @@ slightly better frequency response than AM radio: perhaps 40Hz-10,000Hz.
 **Dropouts**: Inconsistent application of the ferric oxide particles often caused volume level variations
 during playback.
 
-[Picture of a dropout](../images/TRS-80-Mod1_TC-8_Dropout.JPG)
+![Picture of a dropout](../images/TRS-80-Mod1_TC-8_Dropout.JPG)
 
 
 ### Background Noise
