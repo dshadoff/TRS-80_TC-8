@@ -125,13 +125,13 @@ From here, files for BASIC or machine-language data/programs have different form
 | 02 | File Type | The file type for a machine-language program is 0x55. |
 | 03-08 | Filename | The filename for the file on tape can be up to 6 characters in length, stored in ASCII, and with trailing spaces if the name is shorted than 6 characters. |
 | 09-?? | DATABLOCK | There can be one or more datablocks in the file. |
-| **DATABLOCK FORMAT** |
+| |  **DATABLOCK FORMAT** | |
 | 01 | Block Type | This is 0x3C for binary data |
 | 02 | No. of Bytes | Number of bytes in block. '0x00' implies 256; other values are as stated (i.e. 0x05 = 5) |
 | 03-04 | Load Address | This is where the data is to be loaded, least-significant byte first. (i.e. 0x00 0x4B = 0x4B00). Blocks do not need to be contiguous, but most of the time they are. |
 | 05-nn | Data | Bytes to load |
 | EOB | Checksum value to validate whether data loaded was correct |
-| **END OF FILE BLOCK** |
+| | **END OF FILE BLOCK** | |
 | 01 | Block type | This is 0x78 to indicate transfer address. |
 | 02-03 | Transfer Address | This is where execution is to start, least-significant byte first. (i.e. 0x00 0x4B = 0x4B00). |
 
