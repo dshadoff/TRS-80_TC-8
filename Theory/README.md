@@ -52,7 +52,7 @@ be taken into account.
 
 ## Tape Formats
 
-### Bit-level Encoding
+### TRS-80 Native Format
 
 Of course, every file can be decomposed into bytes, and bytes need to be serialized into a series of bits.
 The most basic format of storage on cassettes must be a bit, and from there, a more comprehensive protocol
@@ -69,6 +69,8 @@ The following image shows the timebase, and two '1' bits toward the right edge -
 no longer appears to be a squarewave, due to the limited frequency response of the medium:
 
 ![Picture of several TRS-80 bits](../images/TRS-80-Mod1_500_macro.JPG)
+
+![Individual TRS-80 bits](../images/TRS-80-Mod1_500_44.1KHz_samples.JPG)
 
 The pulses include both a descending and an ascending pulse (below and above the midway line), fulfilling
 the polarity requirement. These pulses are approximately 450 microseconds wide. The delay between clock pulses is
@@ -125,21 +127,61 @@ From here, files for BASIC or machine-language data/programs have different form
 | 02 | File Type | The file type for a machine-language program is 0x55. |
 | 03-08 | Filename | The filename for the file on tape can be up to 6 characters in length, stored in ASCII, and with trailing spaces if the name is shorted than 6 characters. |
 | 09-?? | DATABLOCK | There can be one or more datablocks in the file. |
-| |  **DATABLOCK FORMAT** | |
+| |  **DATABLOCK FORMAT**: | |
 | 01 | Block Type | This is 0x3C for binary data |
 | 02 | No. of Bytes | Number of bytes in block. '0x00' implies 256; other values are as stated (i.e. 0x05 = 5) |
 | 03-04 | Load Address | This is where the data is to be loaded, least-significant byte first. (i.e. 0x00 0x4B = 0x4B00). Blocks do not need to be contiguous, but most of the time they are. |
 | 05-nn | Data | Bytes to load |
 | EOB | Checksum value to validate whether data loaded was correct |
-| | **END OF FILE BLOCK** | |
+| | **END OF FILE BLOCK**: | |
 | 01 | Block type | This is 0x78 to indicate transfer address. |
 | 02-03 | Transfer Address | This is where execution is to start, least-significant byte first. (i.e. 0x00 0x4B = 0x4B00). |
 
 
+### TC-8 Format
 
-#### TC-8 Format
+Of course, every file can be decomposed into bytes, and bytes need to be serialized into a series of bits.
+The most basic format of storage on cassettes must be a bit, and from there, a more comprehensive protocol
+must be constructed.
 
-### File Level - BINARY
+#### TC-8 Format - Bit-Level Encoding
+
+At the lowest level, the TC-8 writes bits to tape with half-waves.
+
+The TC-8 hardware adds a zero-crossing comparator, and checks for the timing of waveform zero-crossing, instead
+of hitting a volume threshold. Zero-crossing is MUCH less sensitive to absolute volume levels, and also works
+with eith polarity, since zero-crossing from positive to negative is treated the same as zero-crossing from
+negative to positive.
+
+* A '0' is represented by a 'long' halfwave (either positive or negative) of roughly 370 microseconds.
+* A '1' is represented by two 'short' halfwaves, each with a duration of roughly 170 microsoeconds, for a
+total of roughly 340 micrososeconds.
+
+The following image shows several long ('0') halfwaves, followed by a short (sync) halfwave, and two short
+fullwaves ('1' values).
+
+![Individual TC-8 bits](../images/TRS-80-Mod1_TC-8_44.1KHz_samples.JPG)
+
+#### TC-8 Format - Assembling Bits into Bytes
+
+In order to assemble bits into bytes, two things must happen (as mentioned above for TRS-80 format):
+1. Synchronization, and
+2. Agreement of bit sequence
+
+In order to synchronize, the start of a file begins with a series of many long (zero) halfwaves, followed by a
+single short halfwave (not a full '1' wave). This is then followed by a 0xB3 sync byte (10110011 binary).
+
+The bit sequence for TC-8 format is LEAST-significant bit first, so the long sequence of LONG halfwaves
+is followed by short halwaves as follows: s SS SS L L SS SS L SS x.
+
+In this example:
+1. The lowercase 's' denotes the sync halfwave indicating the start of the sync
+2. The uppercase 'SS' denotes the two short halfwaves to indicate a '1' bit value
+3. The uppercase 'L' denotes the single long halfwave to indicate a '0' bit value.
+4. The lowercase 'x' denotes the single long halfwave used as an inter-byte separator.
+
+
+#### File Level - Overall Tape Protocol - BINARY
 
 Binary files are saved as two consecutive blocks, each with it own leader & sync byte:
 
@@ -157,6 +199,14 @@ Binary files are saved as two consecutive blocks, each with it own leader & sync
 | 17-18 | Entry Address | These two bytes are stored in LSB / MSB order and hold the entry address of the program, where the user should jump to, in order to start running the program. |
 | 19 | Checksum | This byte is used to compare against a running tally of the bytes so far, in order to validate whether there have been any errors during reading/writing.<p> The checksum is calculated by adding the values of bytes #2 through #18, and using only the least-significant byte of this sum for comparison against the checksum. |
 
+**BLOCK 2 - DATA**
+
+| Bytes | Usage | Description |
+|-------|-------|-------------|
+| -- | Lead-In | A second lead-in consists of roughly 256 iterations of '0' bits (long halfwave), roughly 0.1 seconds. This is followed by a single short halfwave as a sync bit. |
+| 01 | Sync Byte | The lead-in is followed by a sync byte of 0xB3 ('Byte 01'). |
+| 02 | Data | This is the data to be loaded at the location specified byte the Header block. This data is not segmented into multipl blocks as it is on the TRS-80; only a single block of data is included. |
+| nn | Checksum | This byte is used to compare against a running tally of the bytes so far, in order to validate whether there have been any errors during reading/writing.<p> The checksum is calculated by adding the values of all data bytes and using only the least-significant byte of this sum for comparison against the checksum. |
 
 
 
