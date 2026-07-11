@@ -17,7 +17,7 @@ information to decode binary (machine language) files.
 I wrote a program in Python to be able to decode WAV files and display output
 of the data contained therein.
 
-You can find more information about the actual tape encoding in the [Theory_of_Operation](Theory_of_peration.md) file.
+You can find more information about the actual tape encoding in the [Theory_of_Operation](Theory_of_Operation.md) file.
 
 
 ### Prerequisites:
