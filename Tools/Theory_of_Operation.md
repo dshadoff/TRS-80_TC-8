@@ -1,4 +1,4 @@
-# TRS-80_TC-8 Theory Folder
+# TRS-80_TC-8 Theory Of Operation
 
 ## Background
 
@@ -58,7 +58,7 @@ Of course, every file can be decomposed into bytes, and bytes need to be seriali
 The most basic format of storage on cassettes must be a bit, and from there, a more comprehensive protocol
 must be constructed.
 
-#### TRS-80 Native Format - Bit-Level Encoding
+#### TRS-80 Native Format - Bit-Level Modulation
 
 At the lowest level, the TRS-80 Model 1 wrote bits to tape using pulses. The pulses formed a timebase,
 with a separation of 2 milliseconds as a "clock" of sorts; the presence of an additional pulse midway between two
@@ -145,7 +145,7 @@ As stated above, every file can be decomposed into bytes, and bytes need to be s
 The most basic format of storage on cassettes must be a bit, and from there, a more comprehensive protocol
 must be constructed.
 
-#### TC-8 Format - Bit-Level Encoding
+#### TC-8 Format - Bit-Level Modulation
 
 At the lowest level, the TC-8 writes bits to tape with half-waves.
 
@@ -162,6 +162,7 @@ The following image shows several long ('0') halfwaves, followed by a short (syn
 fullwaves ('1' values).
 
 ![Individual TC-8 bits](../images/TRS-80-Mod1_TC-8_44.1KHz_samples.JPG)
+
 
 #### TC-8 Format - Assembling Bits into Bytes
 

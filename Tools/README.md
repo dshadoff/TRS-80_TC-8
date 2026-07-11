@@ -17,6 +17,9 @@ information to decode binary (machine language) files.
 I wrote a program in Python to be able to decode WAV files and display output
 of the data contained therein.
 
+You can find more information about the actual tape encoding in the [Theory_of_Operation](Theory_of_peration.md) file.
+
+
 ### Prerequisites:
 
 The TC-8 cassette recording must be recorded into a WAV file, using an audio program;
@@ -51,7 +54,11 @@ it into CAS or other data formats, but that should now be possible for BINARY fi
 all of the relevant data is decoded and displayed.
 
 Both Header and internal data are displayed, byte-by-byte, along with what data is actually
-held (at least for binary files):
+held (at least for binary files).
+
+I have included several "WAV" files and their corresponding output "log" files in this folder
+for illustration purposes.
+
 
 **HEADER INFORMATION is as follows:**
 ```

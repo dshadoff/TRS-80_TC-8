@@ -33,6 +33,11 @@ def read_int2(ptr, mem_block):
 
 def get_nextsample(mem_block):
     global fileptr
+    global filesize
+
+    if (fileptr >= filesize):
+        print("END OF FILE FOUND")
+        exit()
     nextval = read_int2(fileptr, mem_block)
     if nextval > 32767:
         nextval = nextval - 65536
@@ -276,6 +281,8 @@ print("")
 
 print("Block 2 Byte #01 = 0x{0:02X}".format(headerbyte))
 
+print("")
+
 cksum2 = 0
 
 address = (start & 0xFFF0)
@@ -283,7 +290,7 @@ string = ""
 if (address < start):
     print("0x{0:04X}:".format(address), end=" ")
 while (address < start):
-    print("    ", end=" ")
+    print("  ", end=" ")
     string= string + " "
     address = address + 1
 
@@ -301,6 +308,9 @@ while (address <= end):
     cksum2 = cksum2 + nextbyte
     print("{0:02X}".format(nextbyte), end=" ")
     address = address + 1
+
+if ((address & 0xF) == 0):
+    print("  ", string)
 print("")
 print("")
 

@@ -1,0 +1,54 @@
+filesize =   384 KB
+imported
+
+PCM
+Number of channels: 1
+Sample Rate (Hz): 44100
+Bytes Per Second: 88200
+Bits Per Sample: 16
+
+Found leader and start bit
+
+Byte #01 = 0xB3
+Byte #02 = 0x9D
+Byte #03 = 0x25 ('%') = type  BINARY
+
+Byte #04-#11 = 0x48 0x41 0x52 0x4D 0x4F 0x4E 0x49 0x58  ('HARMONIX')
+Byte #12 = 0x00
+
+Byte #13-#14 = 0x00 0x4C  (START = 0x4C00) 
+Byte #15-#16 = 0x1E 0x4D  (END   = 0x4D1E) 
+Byte #17-#18 = 0x00 0x4C  (ENTRY = 0x4C00) 
+
+Byte #19 = 0x2B (checksum, match against 0x2B)
+--> MATCH !
+
+
+Found second leader and start bit
+
+Block 2 Byte #01 = 0xB3
+
+   
+0x4C00: 3E 00 32 AF 4C F3 31 FF 4F 21 00 3C 11 01 3C 01    >.2.L.1.O!.<..<.
+0x4C10: FF 03 36 80 ED B0 21 7F 4D 11 80 4D 01 5F 00 36    ..6...!M..M._.6
+0x4C20: 00 ED B0 3A AF 4C CB 47 20 0E 21 1F 4D 06 30 11    ...:.L.G .!.M.0.
+0x4C30: 00 3F 73 23 72 23 10 FA 0E 03 CD B8 4C 3A 40 38    .?s#r#......L:@8
+0x4C40: E6 68 28 11 CB 5F 20 51 CB 6F 20 04 3E 49 18 02    .h(.._ Q.o .>I..
+0x4C50: 3E 35 32 20 4D DD 21 1F 4D 06 2E DD 5E 00 DD 56    >52 M.!.M...^..V
+0x4C60: 01 DD 6E 04 DD 66 05 19 DD 5E 02 DD 56 03 CB 23    ..n..f...^..V..#
+0x4C70: CB 12 A7 ED 52 CB 2C CB 1D DD 5E 62 DD 56 63 19    ....R.,...^b.Vc.
+0x4C80: DD 75 62 DD 74 63 DD 23 DD 23 10 CF 3E 3F 32 20    .ub.tc.#.#..>?2 
+0x4C90: 4D 0E 00 CD B8 4C C3 3D 4C 3A AF 4C CB 47 CA 09    M....L.=L:.L.G..
+0x4CA0: 4C ED 7B B0 4C C9 ED 73 B0 4C 3E 01 C3 02 4C 00    L.{.L..s.L>...L.
+0x4CB0: 00 00 01 02 04 08 10 20 11 00 3C 06 30 FD 21 B2    ....... ..<.0.!.
+0x4CC0: 4C DD 21 1F 4D DD 7E 01 E6 7F 6F 26 00 CB 3D 38    L.!.M.~..o&..=8
+0x4CD0: 05 FD 7E 00 18 03 FD 7E 01 19 CB 41 28 24 B6 77    ..~....~...A($.w
+0x4CE0: CB 49 20 02 0E 00 FD CB 00 66 20 0B FD 23 FD 23    .I ......f ..#.#
+0x4CF0: DD 23 DD 23 10 CF C9 FD 21 B2 4C 21 40 00 19 EB    .#.#....!.L!@...
+0x4D00: 18 EE 2F A6 77 0E 01 D5 DD 5E 60 DD 56 61 DD 6E    ../.w....^`.Va.n
+0x4D10: 00 DD 66 01 19 DD 75 00 DD 74 01 D1 C3 C5 4C 
+
+Block 2 Final Byte = 0x28  (checksum, match against 0x28)
+--> MATCH !
+
+END of FILE. fileptr =  364826

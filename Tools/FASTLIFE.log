@@ -1,0 +1,46 @@
+filesize =   352 KB
+imported
+
+PCM
+Number of channels: 1
+Sample Rate (Hz): 44100
+Bytes Per Second: 88200
+Bits Per Sample: 16
+
+Found leader and start bit
+
+Byte #01 = 0xB3
+Byte #02 = 0x9D
+Byte #03 = 0x25 ('%') = type  BINARY
+
+Byte #04-#11 = 0x46 0x41 0x53 0x54 0x4C 0x49 0x46 0x45  ('FASTLIFE')
+Byte #12 = 0x00
+
+Byte #13-#14 = 0x00 0x6F  (START = 0x6F00) 
+Byte #15-#16 = 0x9D 0x6F  (END   = 0x6F9D) 
+Byte #17-#18 = 0x00 0x6F  (ENTRY = 0x6F00) 
+
+Byte #19 = 0xFA (checksum, match against 0xFA)
+--> MATCH !
+
+
+Found second leader and start bit
+
+Block 2 Byte #01 = 0xB3
+
+   
+0x6F00: 21 16 40 36 E3 23 36 03 F3 CD C9 01 21 00 70 11    !.@6.#6.....!.p.
+0x6F10: 01 70 01 FF 03 36 FF ED B0 21 00 3C DD 21 00 70    .p...6...!.<.!.p
+0x6F20: 01 00 04 7E FE 20 CA 41 6F DD 34 BF DD 34 C0 DD    ...~. .Ao.4..4..
+0x6F30: 34 C1 DD 34 FF DD 34 01 DD 34 3F DD 34 40 DD 34    4..4..4..4?.4@.4
+0x6F40: 41 23 DD 23 0D C2 23 6F 05 C2 23 6F 21 00 3C 11    A#.#..#o..#o!.<.
+0x6F50: 00 70 06 04 1A 3D CA 64 6F 3D C2 62 6F 36 2E C3    .p...=.do=.bo6..
+0x6F60: 64 6F 36 20 3E FF 12 23 13 0D C2 54 6F 05 C2 54    do6 >..#...To..T
+0x6F70: 6F 3A 10 38 A7 CA 19 6F 57 ED 5F 5F C5 47 10 FE    o:.8...oW.__.G..
+0x6F80: C1 ED 5F 83 82 5F 7A 16 3C C5 4F 47 ED 5F E6 02    .._.._z.<.OG._..
+0x6F90: C2 97 6F 3E 2E 12 13 10 F3 C1 C3 19 6F FF 
+
+Block 2 Final Byte = 0x10  (checksum, match against 0x10)
+--> MATCH !
+
+END of FILE. fileptr =  349306
