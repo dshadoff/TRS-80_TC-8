@@ -49,5 +49,7 @@ all in this folder.
 | Name | Description |
 | ---- | ----------- |
 | [TC-8_Purchase_19810627.jpg](TC-8_Purchase_19810627.jpg) | Receipt for purchase of TC-8 in 1981 |
+| [EP-38_Delay_Postcard_19820824_front.jpg](EP-38_Delay_Postcard_19820824_front.jpg) | Postcard indicating production delays of EP-38 board (front) |
+| [EP-38_Delay_Postcard_19820824_rear.jpg](EP-38_Delay_Postcard_19820824_rear.jpg) | Postcard indicating production delays of EP-38 board (rear) |
 | [EP-38_Purchase_19821016.jpg](EP-38_Purchase_19821016.jpg) | Receipt for purchase of EP-38 board in 1982 |
 
