@@ -39,7 +39,7 @@ In this repository, I aim to recover as much information as possible about this 
 and how it functioned - for users, historians, and researchers wishing to understand
 the technology of the late 1970s and early 1980s.
 
-### Cassette Folder
+### [Cassette](Cassette) Folder
 
 In this folder, I will archive all TC-8 related cassette recordings I can locate.
 
@@ -60,12 +60,12 @@ In this folder, I will archive all of the documents available which originally c
 - Advertising materials
 etc.
 
-### EPROM Folder
+### [EPROM](EPROM) Folder
 
 In this folder, I will archive all information about the EPROM board and the contents of the
 TC-8 EPROM, including a commented disassembly of how it worked (work in progress).
 
-### Tools Folder
+### [Tools](Tools) Folder
 
 In this folder, I wil use the documentation found in any documents and disassemblies of TC-8
 operating programs, in order to be able to read TC-8 recordings on modern computers.
