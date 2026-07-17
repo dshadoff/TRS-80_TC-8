@@ -41,9 +41,7 @@ the technology of the late 1970s and early 1980s.
 
 ### Cassette Folder
 
-In this folder, I will archive all cassette recordings I can locate, and conversions to
-*.CAS format (where applicable), so that they can be loaded by modern emulators or
-recreated as sound via modern sources.
+In this folder, I will archive all TC-8 related cassette recordings I can locate.
 
 Where possible, I will also try to locate TC-8 format recordings so that they can also
 be analyzed.
@@ -53,7 +51,7 @@ TC-8 device (except UTIL, for which the latest known version is covered in the E
 folder).
 
 
-### Documents Folder
+### [Documents](Documents) Folder
 
 In this folder, I will archive all of the documents available which originally came on paper:
 - Assembly instructions
@@ -66,4 +64,13 @@ etc.
 
 In this folder, I will archive all information about the EPROM board and the contents of the
 TC-8 EPROM, including a commented disassembly of how it worked (work in progress).
+
+### Tools Folder
+
+In this folder, I wil use the documentation found in any documents and disassemblies of TC-8
+operating programs, in order to be able to read TC-8 recordings on modern computers.
+
+I have already been able to decode the bit modulation, and binary (machine language) program
+protocol. The folder contains a Python script to extract and display information from old
+cassette recordings made by the TC-8.
 
