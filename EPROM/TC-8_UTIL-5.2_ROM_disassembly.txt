@@ -16,7 +16,7 @@
 ;
 ;
 3000: 18 1b        jr   $301D           ; Entry point including keyboard debounce routine
-3002: c3 23 30     jp   $3023           ; Main entry point
+3002: c3 23 30     jp   $3023           ; Main entry point (minus keyboard debounce)
 3005: c3 1a 34     jp   $341A       ; MOTOR_ON
 3008: c3 2b 34     jp   $342B       ; GETID
 300b: c3 68 34     jp   $3468       ; GETID2
@@ -51,11 +51,11 @@
 3062: 21 53 33     ld   hl,$3353
 3065: 22 89 41     ld   ($4189),hl      ; Address for DISK BASIC exit (LOAD)
 3068: 21 80 00     ld   hl,$0080
-306b: 22 79 40     ld   ($4079),hl
+306b: 22 79 40     ld   ($4079),hl      ; Put value of 128 (bytes) into size of DATA FILE buffer
 306e: 21 60 42     ld   hl,$4260
-3071: 22 7b 40     ld   ($407B),hl
-3074: 2a 16 40     ld   hl,($4016)
-3077: 22 77 40     ld   ($4077),hl
+3071: 22 7b 40     ld   ($407B),hl      ; Put 0x4260 into location of start of DATA FILE buffer
+3074: 2a 16 40     ld   hl,($4016)      ; keyboard driver address
+3077: 22 77 40     ld   ($4077),hl      ; put it in 0x4077
 307a: 2a 1e 40     ld   hl,($401E)
 307d: 22 7d 40     ld   ($407D),hl
 3080: 3e c3        ld   a,$C3
@@ -95,22 +95,22 @@ TC8_CLOSE:
 30c6: c9           ret
 
 30c7: e5           push hl
-30c8: 2a 7d 40     ld   hl,($407D)
-30cb: 22 1e 40     ld   ($401E),hl
-30ce: 2a 77 40     ld   hl,($4077)
-30d1: 22 16 40     ld   ($4016),hl
+30c8: 2a 7d 40     ld   hl,($407D)      ; get video driver address
+30cb: 22 1e 40     ld   ($401E),hl      ; restore it to 0x401E
+30ce: 2a 77 40     ld   hl,($4077)      ; get keyboard driver address
+30d1: 22 16 40     ld   ($4016),hl      ; restore it to 0x4016
 30d4: e1           pop  hl
 30d5: 7e           ld   a,(hl)
 30d6: c9           ret
 
-30d7: 2a 16 40     ld   hl,($4016)
-30da: 22 77 40     ld   ($4077),hl
-30dd: 2a 1e 40     ld   hl,($401E)
-30e0: 22 7d 40     ld   ($407D),hl
+30d7: 2a 16 40     ld   hl,($4016)      ; keyboard driver address
+30da: 22 77 40     ld   ($4077),hl      ; put it in 0x4077 (temporary storage)
+30dd: 2a 1e 40     ld   hl,($401E)      ; video driver address
+30e0: 22 7d 40     ld   ($407D),hl      ; put it in 0x407D (temporary storage)
 30e3: 21 47 31     ld   hl,$3147
-30e6: 22 16 40     ld   ($4016),hl
+30e6: 22 16 40     ld   ($4016),hl      ; override keyboard driver with 0x3147
 30e9: 21 c1 31     ld   hl,$31C1
-30ec: 22 1e 40     ld   ($401E),hl
+30ec: 22 1e 40     ld   ($401E),hl      ; override video driver with 0x31C1
 30ef: e1           pop  hl
 30f0: 23           inc  hl
 30f1: 23           inc  hl
@@ -118,22 +118,22 @@ TC8_CLOSE:
 30f3: 7e           ld   a,(hl)
 30f4: c9           ret
 
-30f5: fe 23        cp   $23
+30f5: fe 23        cp   $23             ; '#'
 30f7: c0           ret  nz
 30f8: 23           inc  hl
 30f9: 7e           ld   a,(hl)
-30fa: fe 31        cp   $31
+30fa: fe 31        cp   $31             ; '1'
 30fc: 20 04        jr   nz,$3102
 30fe: 3e 04        ld   a,$04
 3100: 18 05        jr   $3107
-3102: fe 32        cp   $32
+3102: fe 32        cp   $32             ; '2'
 3104: c0           ret  nz
 
 3105: 3e 08        ld   a,$08
 3107: 32 6c 40     ld   ($406C),a
 310a: 23           inc  hl
 310b: 7e           ld   a,(hl)
-310c: fe 2c        cp   $2C
+310c: fe 2c        cp   $2C             ; ','
 310e: c9           ret
 
 310f: d9           exx
@@ -141,9 +141,9 @@ TC8_CLOSE:
 3114: fd 21 50 40  ld   iy,$4050
 3118: fd 36 1a 00  ld   (iy+$1a),$00
 311c: fd 36 1e 00  ld   (iy+$1e),$00
-3120: 2a 7b 40     ld   hl,($407B)
+3120: 2a 7b 40     ld   hl,($407B)      ; location of start of DATA FILE buffer
 3123: eb           ex   de,hl
-3124: 2a 79 40     ld   hl,($4079)
+3124: 2a 79 40     ld   hl,($4079)      ; size of DATA FILE buffer
 3127: 19           add  hl,de
 3128: 2b           dec  hl
 3129: 22 71 40     ld   ($4071),hl
@@ -160,6 +160,9 @@ TC8_CLOSE:
 313f: 32 6b 40     ld   ($406B),a       ; 406B = state holder
 3142: cd 74 31     call $3174
 3145: 18 90        jr   $30D7
+;
+; temporary override keyboard driver
+;
 3147: 3a 6b 40     ld   a,($406B)       ; 406B = state holder
 314a: fe 02        cp   $02
 314c: c8           ret  z
@@ -189,11 +192,11 @@ TC8_CLOSE:
 3176: fd e5        push iy
 3178: cd 0f 31     call $310F
 317b: cd d2 34     call $34D2
-317e: 2a 7b 40     ld   hl,($407B)
+317e: 2a 7b 40     ld   hl,($407B)  ; location of start of DATA FILE buffer
 3181: 22 75 40     ld   ($4075),hl
 3184: d4 73 34     call nc,$3473
 3187: cd 20 34     call $3420       ; MOTOR_OFF
-318a: 2a 79 40     ld   hl,($4079)
+318a: 2a 79 40     ld   hl,($4079)  ; size of DATA FILE buffer
 318d: 22 73 40     ld   ($4073),hl
 3190: d9           exx
 3191: fd e1        pop  iy
@@ -212,12 +215,14 @@ TC8_CLOSE:
 31aa: f2 c8 30     jp   p,$30C8
 31ad: 3e 02        ld   a,$02
 31af: 32 6b 40     ld   ($406B),a       ; 406B = state holder
-31b2: 2a 7b 40     ld   hl,($407B)
+31b2: 2a 7b 40     ld   hl,($407B)      ; location of start of DATA FILE buffer
 31b5: 22 75 40     ld   ($4075),hl
-31b8: 2a 79 40     ld   hl,($4079)
+31b8: 2a 79 40     ld   hl,($4079)      ; size of DATA FILE buffer
 31bb: 22 73 40     ld   ($4073),hl
 31be: c3 d7 30     jp   $30D7
 
+; temporary override video driver
+;
 31c1: f5           push af
 31c2: 79           ld   a,c
 31c3: fe 0d        cp   $0D
@@ -247,13 +252,13 @@ TC8_CLOSE:
 31ef: fd e5        push iy
 31f1: cd 0f 31     call $310F
 31f4: cd 95 32     call $3295
-31f7: 2a 7b 40     ld   hl,($407B)
+31f7: 2a 7b 40     ld   hl,($407B)      ; location of start of DATA FILE buffer
 31fa: 22 75 40     ld   ($4075),hl
 31fd: cd c3 32     call $32C3
 3200: c3 87 31     jp   $3187
 
 ;
-;TC8_GET - load a binary program (GUT "<FILENAME>")
+;TC8_GET - load a binary program (GET "<FILENAME>")
 ;--------
 3203: cd 33 32     call $3233
 3206: c3 56 33     jp   $3356
@@ -264,12 +269,13 @@ TC8_CLOSE:
 ;--------
 3209: cd 33 32     call $3233
 320c: 11 52 40     ld   de,$4052
-320f: cd 34 35     call $3534
+320f: cd 34 35     call $3534       ; get filename and put it at 0x4052
 3212: 11 5c 40     ld   de,$405C
-3215: cd 4e 32     call $324E
+3215: cd 4e 32     call $324E       ; get <BEGIN>,<END>,<TRANSFER> addresses and put them at 0x405C, 0x405E, 0x4060
 3218: c3 39 33     jp   $3339
+
 321b: 7e           ld   a,(hl)
-321c: fe 22        cp   $22
+321c: fe 22        cp   $22         ; Quotation mark
 321e: c0           ret  nz
 321f: cd c8 33     call $33C8
 3222: fd 36 1e 20  ld   (iy+$1e),$20
@@ -286,20 +292,24 @@ TC8_CLOSE:
 3237: fd 36 11 25  ld   (iy+$11),$25
 323b: fd 36 1e 10  ld   (iy+$1e),$10
 323f: c3 d4 33     jp   $33D4
+
 3242: 2a 5f 40     ld   hl,($405F)
 3245: cd 20 34     call $3420       ; MOTOR_OFF
 3248: cd 61 1b     call $1B61
 324b: c3 b2 02     jp   $02B2
+
+; get 3 hex addressess, separated by commas (<BEGIN>,<END>,<TRANSFER>):
+;
 324e: 06 03        ld   b,$03
-3250: cd 6c 32     call $326C
+3250: cd 6c 32     call $326C       ; get a 2-digit hex value (high byte of address)
 3253: 12           ld   (de),a
 3254: 23           inc  hl
 3255: 1b           dec  de
-3256: cd 6c 32     call $326C
+3256: cd 6c 32     call $326C       ; get a 2-digit hex value (low byte of address)
 3259: 12           ld   (de),a
 325a: 23           inc  hl
 325b: 7e           ld   a,(hl)
-325c: fe 2c        cp   $2C
+325c: fe 2c        cp   $2C         ; ','
 325e: c2 67 32     jp   nz,$3267
 3261: 23           inc  hl
 3262: 13           inc  de
@@ -308,10 +318,12 @@ TC8_CLOSE:
 3265: 10 e9        djnz $3250
 3267: 05           dec  b
 3268: c8           ret  z
-3269: c3 97 19     jp   $1997
-
-326c: 7e           ld   a,(hl)
-326d: cd 80 32     call $3280
+3269: c3 97 19     jp   $1997       ; ?SN Error code
+;
+; get 2 hex digits and turn into a byte:
+;
+326c: 7e           ld   a,(hl)      ; get next digit
+326d: cd 80 32     call $3280       ; get hex value in A
 3270: cb 27        sla  a
 3272: cb 27        sla  a
 3274: cb 27        sla  a
@@ -322,17 +334,21 @@ TC8_CLOSE:
 327b: cd 80 32     call $3280
 327e: b1           or   c
 327f: c9           ret
-3280: d6 47        sub  $47
-3282: f2 97 19     jp   p,$1997
-3285: c6 06        add  a,$06
-3287: f2 8f 32     jp   p,$328F
-328a: c6 07        add  a,$07
-328c: f2 97 19     jp   p,$1997
-328f: c6 0a        add  a,$0A
-3291: fa 97 19     jp   m,$1997
-3294: c9           ret
 
-; write lead-in (
+; Get a hexadecimal number from command line, and convert to a value from 0 to 15:
+;
+3280: d6 47        sub  $47         ; compare to 'G'
+3282: f2 97 19     jp   p,$1997     ; ?SN Error code
+3285: c6 06        add  a,$06
+3287: f2 8f 32     jp   p,$328F     ; go to 0x328F if it's between A-F
+328a: c6 07        add  a,$07
+328c: f2 97 19     jp   p,$1997     ; ?SN Error code (because it's between '9' and 'A')
+328f: c6 0a        add  a,$0A
+3291: fa 97 19     jp   m,$1997     ; ?SN Error code (if it's not between '0' and '9')
+3294: c9           ret
+;
+; write lead-in (roughly 3 seconds - all zero's, 0x1FFF of them)
+;
 3295: cd 1a 34     call $341A
 3298: 11 ff 1f     ld   de,$1FFF
 329b: cd 02 33     call $3302
@@ -423,7 +439,7 @@ TC8_CLOSE:
 ;--------
 3323: cd c8 33     call $33C8
 3326: 11 52 40     ld   de,$4052
-3329: cd 34 35     call $3534           ; get filename into $4052
+3329: cd 34 35     call $3534           ; get filename and put it at 0x4052
 332c: 2a a4 40     ld   hl,($40A4)      ; start of BASIC program pointer
 332f: 22 5b 40     ld   ($405B),hl      ; DOS address of task dispatcher
 3332: 2a f9 40     ld   hl,($40F9)      ; End of BASIC program pointer
@@ -477,7 +493,7 @@ TC8_LOAD:
 339c: c2 42 32     jp   nz,$3242
 339f: 2a 5d 40     ld   hl,($405D)
 33a2: 23           inc  hl
-33a3: 22 f9 40     ld   ($40F9),hl
+33a3: 22 f9 40     ld   ($40F9),hl          ; End of BASIC program pointer
 33a6: fd cb 1e 6e  bit  5,(iy+$1e)
 33aa: c1           pop  bc
 33ab: c2 5d 1b     jp   nz,$1B5D
@@ -690,19 +706,21 @@ TC8_LOAD:
 3526: d7           rst  $10         ; get next (command line) character
 3527: 11 62 40     ld   de,$4062
 352a: fe 22        cp   $22
-352c: 28 06        jr   z,$3534
-352e: fd cb 1e de  set  3,(iy+$1e)
+352c: 28 06        jr   z,$3534     ; if quotation mark, then get filenaem
+352e: fd cb 1e de  set  3,(iy+$1e)  ; otherwise, name not specified
 3532: 18 15        jr   $3549
 
+; Parse command line for "filename":
+;
 3534: 2b           dec  hl
 3535: d7           rst  $10         ; get next (command line) character
-3536: fe 22        cp   $22
-3538: 20 14        jr   nz,$354E
-353a: 06 08        ld   b,$08
+3536: fe 22        cp   $22         ; quotation mark
+3538: 20 14        jr   nz,$354E    ; if not quote, then syntax error
+353a: 06 08        ld   b,$08       ; filename can be up to 8 characters in length
 353c: d7           rst  $10         ; get next (command line) character
-353d: 28 14        jr   z,$3553
-353f: fe 22        cp   $22
-3541: 28 10        jr   z,$3553
+353d: 28 14        jr   z,$3553     ; if end of line, blank-fill name
+353f: fe 22        cp   $22         ; quotation mark
+3541: 28 10        jr   z,$3553     ; if quote, then exit loop early
 3543: 12           ld   (de),a      ; put character into name buffer ($4062)
 3544: 13           inc  de
 3545: 10 f5        djnz $353C
@@ -711,7 +729,7 @@ TC8_LOAD:
 3549: 7e           ld   a,(hl)
 354a: b7           or   a
 354b: c8           ret  z
-354c: fe 22        cp   $22
+354c: fe 22        cp   $22         ; quotation mark
 354e: c2 97 19     jp   nz,$1997    ; "S/N ERROR" code
 3551: d7           rst  $10         ; get next (command line) character
 3552: c9           ret
